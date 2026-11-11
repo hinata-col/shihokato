@@ -255,6 +255,23 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 }
 .tile .tt{font-size:15px;line-height:1.5;overflow-wrap:anywhere}
 .tile .meta{font-size:12.5px}
+.catnote{margin:-6px 2px 10px;font-size:13.5px;color:var(--muted);line-height:1.6;display:flex;align-items:center;gap:6px}
+.stm{color:#d99a00;font-weight:700}
+.tile .tt .stm{margin-right:4px}
+.seg{display:flex;flex-wrap:wrap;gap:2px;margin:0 0 12px -4px}
+.seg button{
+  position:relative;isolation:isolate;min-height:44px;padding:0 9px;border:0;background:transparent;cursor:pointer;
+  font-size:16px;color:var(--muted);
+}
+.seg button::before{
+  content:"";position:absolute;z-index:-1;left:4px;right:4px;bottom:11px;height:11px;border-radius:6px;
+  background:var(--coral-soft);transform:scaleX(0) rotate(-1.5deg);transform-origin:left center;transition:transform .25s ease;
+}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{color:var(--ink);font-weight:700}
+.seg button[aria-pressed="true"]::before{transform:scaleX(1) rotate(-1.5deg)}
+.seg button small{font-size:12px;color:var(--muted);margin-left:3px;font-weight:500}
+.panel[hidden]{display:none}
 
 </style>
 </head>
@@ -270,7 +287,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     </div>
     <nav class="catnav" id="catNav" aria-label="作品分類" hidden></nav>
     <div id="catList"><div class="state">讀取作品中…</div></div>
-    <p class="foot">作品清單整理自試算表，☆ 為 center 曲。以官方公告為準。</p>
+    <p class="foot">作品清單整理自試算表。以官方公告為準。</p>
   </main>
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
@@ -280,7 +297,6 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
   var CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwvy-Oyq413ORq1Lxo22qGb6VnLp-1Zi2UyfDgIuwAsneVJh0XHZhwm5xagSJ7QGkxFHpHrsN4LKoD/pub?gid=1969998421&single=true&output=csv';
   var CACHE_KEY = 'shk-works-csv-v1';
   var ORDER = ['影視', '舞台', '音樂', '書籍'];
-  var SUBNAME = { solo: 'Solo', center: 'Center', '合唱': '合唱曲' };
   var $ = function (id) { return document.getElementById(id); };
   var listEl = $('catList'), navEl = $('catNav');
   var navBtns = [], secEls = [];
@@ -369,21 +385,41 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
         linksHTML(w.links) + '</div></li>';
     }).join('') + '</ul>';
   }
-  function tilesHTML(items) {
+  var SUB_ORDER = ['SOLO', '一期生曲', 'UNIT曲', '全員曲'];
+  var activeSub = {};
+  function isStar(w) { return /(^|[、,，\s])(☆|★|Center)($|[、,，\s])/i.test(w.tag); }
+  function tileHTML(w) {
+    var tag = String(w.tag || '').split(/[、,，\s]+/).filter(function (t) { return t && !/^(☆|★|center)$/i.test(t); }).join('、');
+    var tags = tagsHTML(tag) + (w.yr ? '<span class="tag plain">' + esc(w.yr) + '</span>' : '');
+    var info = [];
+    if (w.org) info.push(esc(w.org));
+    if (w.role) info.push(esc(w.role));
+    return '<li class="tile"><div class="tt">' + (isStar(w) ? '<span class="stm" title="Center" aria-label="Center">☆</span>' : '') + esc(w.title) + '</div>' +
+      ((info.length || tags) ? '<div class="meta">' + info.join(' · ') + tags + '</div>' : '') + linksHTML(w.links) + '</li>';
+  }
+  function tilesHTML(items, ci) {
     var groups = [], map = {};
     items.forEach(function (w) {
-      var k = w.sub || '';
+      var k = w.sub || '其他';
       if (!map[k]) { map[k] = { k: k, items: [] }; groups.push(map[k]); }
       map[k].items.push(w);
     });
-    return groups.map(function (g) {
-      var head = g.k ? '<h3 class="sub">' + esc(SUBNAME[g.k] || g.k) + '<small>' + g.items.length + ' 首</small></h3>' : '';
-      return head + '<ul class="tiles">' + g.items.map(function (w) {
-        var tags = tagsHTML(w.tag) + (w.yr ? '<span class="tag plain">' + esc(w.yr) + '</span>' : '');
-        return '<li class="tile"><div class="tt">' + esc(w.title) + '</div>' +
-          (tags ? '<div class="meta">' + tags + '</div>' : '') + linksHTML(w.links) + '</li>';
-      }).join('') + '</ul>';
+    groups.sort(function (a, b) {
+      var ia = SUB_ORDER.indexOf(a.k), ib = SUB_ORDER.indexOf(b.k);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    });
+    var cur = activeSub[ci];
+    if (!groups.some(function (g) { return g.k === cur; })) {
+      cur = groups.some(function (g) { return g.k === '全員曲'; }) ? '全員曲' : groups[0].k;
+      activeSub[ci] = cur;
+    }
+    var seg = '<div class="seg" role="group" aria-label="歌曲類型" data-ci="' + ci + '">' + groups.map(function (g) {
+      return '<button type="button" data-sub="' + esc(g.k) + '" aria-pressed="' + (g.k === cur) + '">' + esc(g.k) + '</button>';
+    }).join('') + '</div>';
+    var panels = groups.map(function (g) {
+      return '<div class="panel" data-sub="' + esc(g.k) + '"' + (g.k === cur ? '' : ' hidden') + '><ul class="tiles">' + g.items.map(tileHTML).join('') + '</ul></div>';
     }).join('');
+    return seg + panels;
   }
   function render(works) {
     var cats = [], map = {};
@@ -402,9 +438,10 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     }).join('');
     listEl.innerHTML = cats.map(function (c, i) {
       var items = map[c];
-      var tile = c === '音樂';
-      return '<section class="cat" id="cat-' + i + '"><h2 class="sec">' + esc(c) + '</h2>' +
-        (tile ? tilesHTML(items) : rowsHTML(items)) + '</section>';
+      var tile = items.some(function (w) { return w.sub; });
+      var note = items.some(isStar) ? '<p class="catnote"><span class="stm" aria-hidden="true">☆</span>為加藤史帆擔任 Center 的歌曲</p>' : '';
+      return '<section class="cat" id="cat-' + i + '"><h2 class="sec">' + esc(c) + '</h2>' + note +
+        (tile ? tilesHTML(items, i) : rowsHTML(items)) + '</section>';
     }).join('');
     navBtns = [].slice.call(navEl.querySelectorAll('.chip'));
     secEls = cats.map(function (c, i) { return $('cat-' + i); });
@@ -440,6 +477,13 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var i = +b.dataset.i;
     setActive(i);
     secEls[i].scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+  });
+  listEl.addEventListener('click', function (e) {
+    var b = e.target.closest('.seg button'); if (!b) return;
+    var seg = b.parentNode, ci = seg.dataset.ci, sec = seg.parentNode;
+    activeSub[ci] = b.dataset.sub;
+    [].forEach.call(seg.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    [].forEach.call(sec.querySelectorAll('.panel'), function (p) { p.hidden = p.dataset.sub !== b.dataset.sub; });
   });
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
