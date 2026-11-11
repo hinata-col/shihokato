@@ -357,6 +357,8 @@ a{color:inherit}
   display:flex;flex-direction:column;align-items:flex-end;gap:6px;
 }
 .fab[hidden]{display:none}
+.fab{pointer-events:none}
+.fab-btn,.fab-menu[data-open="true"]{pointer-events:auto}
 .fab::before{content:'';position:fixed;inset:0;z-index:-1;background:rgba(24,44,96,.34);opacity:0;transition:opacity .3s;pointer-events:none}
 .fab:has(.fab-menu[data-open="true"])::before{opacity:1}
 .fab-btn{
@@ -452,7 +454,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
 
           <button type="button" class="ribbon" id="ribbon" aria-haspopup="dialog">新手路線</button>
 
-          <a class="sticker" href="#interview" data-go="訪談報導" style="--x:8%;--y:9%;--w:50%;--r:-3deg;--ar:2/1">
+          <a class="sticker" href="interviews/" data-go="訪談報導" style="--x:8%;--y:9%;--w:50%;--r:-3deg;--ar:2/1">
             <span class="shape" style="--rad:30% / 46%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>柯南眼鏡</span></span><span class="gloss"></span></span>
             <span class="new">NEW</span>
             <span class="label">訪談報導</span>
@@ -509,7 +511,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
               <span class="label">基本資料</span>
             </a>
 
-            <a class="sticker" href="#works" data-go="作品" style="--x:54%;--y:10%;--w:36%;--r:5deg;--ar:1/1.05">
+            <a class="sticker" href="works/" data-go="作品" style="--x:54%;--y:10%;--w:36%;--r:5deg;--ar:1/1.05">
               <span class="shape" style="--rad:38% 42% 40% 40% / 36% 36% 44% 44%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>星際大戰<br>古古</span></span><span class="gloss"></span></span>
               <span class="new">NEW</span>
               <span class="label">作品</span>
@@ -553,11 +555,11 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
 <div class="fab" id="fab" hidden>
   <nav class="fab-menu" id="fabMenu" aria-label="頁面選單" data-open="false" inert>
     <a href="#basic" data-go="基本資料" style="--d:7;--r:-2deg"><span>基本資料</span></a>
-    <a href="#works" data-go="作品" style="--d:6;--r:1.5deg"><span>作品</span></a>
+    <a href="works/" data-go="作品" style="--d:6;--r:1.5deg"><span>作品</span></a>
     <a href="schedule/" data-go="行程" style="--d:5;--r:-1deg"><span>行程</span></a>
     <a href="#fun" data-go="各種歡樂" style="--d:4;--r:-1deg"><span>各種歡樂</span></a>
     <a href="#ayahiro" data-go="彩弘祭典" style="--d:3;--r:2deg"><span>彩弘祭典</span></a>
-    <a href="#interview" data-go="訪談報導" style="--d:2;--r:-1.5deg"><span>訪談報導</span></a>
+    <a href="interviews/" data-go="訪談報導" style="--d:2;--r:-1.5deg"><span>訪談報導</span></a>
     <a href="#outfit" data-go="私服穿搭" style="--d:1;--r:1deg"><span>私服穿搭</span></a>
     <a href="#resources" data-go="相關資源" style="--d:0;--r:-2deg"><span>相關資源</span></a>
   </nav>
@@ -571,7 +573,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   <h2 id="noteTitle">先看這五個就懂她</h2>
   <ol>
     <li><a href="#fun" data-go="各種歡樂"><small>現場魅力</small><span>〈ドレミソラシド〉THE FIRST TAKE</span></a></li>
-    <li><a href="#works" data-go="作品"><small>戲劇</small><span>《彩香最愛弘子前輩》</span></a></li>
+    <li><a href="works/" data-go="作品"><small>戲劇</small><span>《彩香最愛弘子前輩》</span></a></li>
     <li><a href="#fun" data-go="各種歡樂"><small>綜藝</small><span>名場面合輯</span></a></li>
     <li><a href="#fun" data-go="各種歡樂"><small>運動</small><span>運動能力好得不得了的加藤史合集</span></a></li>
     <li><a href="#fun" data-go="各種歡樂"><small>才藝</small><span>才能檢定：橡皮章、水彩、刮畫</span></a></li>
@@ -679,9 +681,11 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     toastEl.dataset.timer = '';
     toastTimer = setTimeout(function () { toastEl.dataset.show = 'false'; }, 2600);
   }
+  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/' };
   document.querySelectorAll('[data-go]').forEach(function (a) {
     a.addEventListener('click', function (e) {
-      if (a.dataset.go === '行程') { a.setAttribute('href','schedule/'); return; }
+      var dest = PAGES[a.dataset.go];
+      if (dest) { a.setAttribute('href', dest); return; }
       e.preventDefault();
       if (note.open) note.close();
       setFab(false);
