@@ -332,6 +332,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
   window.addEventListener('scroll', f, { passive: true }); f();
 
 
+  var setLikes = null;
   (function () {
     var src = document.getElementById('likesData'), box = document.getElementById('doodles');
     if (!src || !box) return;
@@ -353,10 +354,20 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       return { k: li.getAttribute('data-icon'), t: t, h: clone.innerHTML, g: g };
     }).filter(function (d) { return ICON[d.k]; });
     if (!items.length) return;
-    box.innerHTML = items.map(function (d, i) {
-      return '<button type="button" class="dd" data-i="' + i + '" aria-expanded="false" aria-label="' + d.t + '" style="--r:' + ROT[i % ROT.length] + 'deg"><svg viewBox="0 0 64 64" aria-hidden="true">' + ICON[d.k] + '</svg><span>' + d.t + '</span></button>';
-    }).join('');
     var pop = null, curB = null;
+    function draw() {
+      close();
+      box.innerHTML = items.map(function (d, i) {
+        return '<button type="button" class="dd" data-i="' + i + '" aria-expanded="false" aria-label="' + d.t + '" style="--r:' + ROT[i % ROT.length] + 'deg"><svg viewBox="0 0 64 64" aria-hidden="true">' + ICON[d.k] + '</svg><span>' + d.t + '</span></button>';
+      }).join('');
+    }
+    var brushG = []; items.forEach(function (d) { if (d.k === 'brush') brushG = d.g; });
+    setLikes = function (next) {
+      next = next.filter(function (d) { return ICON[d.k]; });
+      if (!next.length) return;
+      next.forEach(function (d) { if (d.k === 'brush' && !d.g.length) d.g = brushG; });
+      items = next; draw();
+    };
     function lightbox(x) {
       var lb = document.createElement('div'); lb.className = 'artlb'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true');
       var im = document.createElement('img'); im.src = x.f; im.alt = x.c;
@@ -370,6 +381,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       document.body.appendChild(lb); cb.focus();
     }
     function close() { if (pop) { pop.remove(); pop = null; } if (curB) { curB.setAttribute('aria-expanded', 'false'); curB = null; } }
+    draw();
     function open(b) {
       close(); curB = b; b.setAttribute('aria-expanded', 'true');
       var d = items[+b.dataset.i];
@@ -520,6 +532,37 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var i = 0; if (keep) data.forEach(function (d, j) { if (d.y === keep) i = j; });
     show(i, 0); centerOn(i, false);
   }
+  var ICONMAP = { '愛心': 'heart', '熊': 'bear', '網球': 'tennis', '城堡': 'movie', '眼睛': 'anime', '畫筆': 'brush' };
+  function loadSheet(url, key, parse, apply) {
+    var c = getCache(key);
+    if (c) { try { apply(parse(parseCSV(c))); } catch (e) {} }
+    fetch(url, { cache: 'no-cache' }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function (t) {
+      var d = parse(parseCSV(t));
+      if (!d.length) throw new Error('empty');
+      setCache(key, t); apply(d);
+    }).catch(function (e) { if (window.console) console.warn('讀取失敗，使用內建內容', e); });
+  }
+  loadSheet(TL_URL.replace(/gid=\d+/, 'gid=819370906'), 'shk-likes-csv-v1', function (rows) {
+    if (!rows.length) return [];
+    var h = rows[0].map(function (x) { return String(x || '').trim(); });
+    var ci = { n: idx(h, /^名稱/), k: idx(h, /^圖案/), c: idx(h, /^內容/) };
+    if (ci.n < 0 || ci.k < 0 || ci.c < 0) return [];
+    var out = [];
+    rows.slice(1).forEach(function (r) {
+      var n = String(r[ci.n] || '').trim(), k = ICONMAP[String(r[ci.k] || '').trim()], c = String(r[ci.c] || '').trim();
+      if (n && k && c) out.push({ k: k, t: n, h: linkify(c), g: [] });
+    });
+    return out;
+  }, function (d) { if (setLikes && d.length) setLikes(d); });
+  var parasEl = document.querySelector('ul.paras');
+  loadSheet(TL_URL.replace(/gid=\d+/, 'gid=819370907'), 'shk-intro-csv-v1', function (rows) {
+    var out = [];
+    rows.slice(1).forEach(function (r) { var t = String(r[0] || '').trim(); if (t) out.push(t); });
+    return out;
+  }, function (d) { if (parasEl && d.length) parasEl.innerHTML = d.map(function (t) { return '<li>' + linkify(t) + '</li>'; }).join(''); });
   var c0 = getCache(TL_KEY);
   if (c0) { try { apply(toData(parseCSV(c0))); } catch (e) {} }
   fetch(TL_URL, { cache: 'no-cache' }).then(function (r) {
