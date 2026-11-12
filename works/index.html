@@ -231,6 +231,8 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .work:first-child{border-top:0}
 .yr{font-size:20px;line-height:1.3;color:var(--denim);font-variant-numeric:tabular-nums}
 .yr.rep{color:transparent;user-select:none}
+.ny .work{grid-template-columns:minmax(0,1fr)}
+.ny .yr{display:none}
 .main{display:flex;flex-direction:column;gap:6px;min-width:0}
 .wt{font-weight:500;font-size:15.5px;line-height:1.5;overflow-wrap:anywhere}
 .meta{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13px;color:var(--muted)}
@@ -312,7 +314,10 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
   'use strict';
   var CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwvy-Oyq413ORq1Lxo22qGb6VnLp-1Zi2UyfDgIuwAsneVJh0XHZhwm5xagSJ7QGkxFHpHrsN4LKoD/pub?gid=1969998421&single=true&output=csv';
   var CACHE_KEY = 'shk-works-csv-v1';
-  var ORDER = ['影視', '舞台', '音樂', '書籍', 'CM'];
+  var ORDER = ['影視', '舞台', '音樂', '書籍', 'CM', '公共廣告'];
+  var YEAR_TABS = ['影視', 'CM'];
+  var LANG = 'zh';
+  function roleText(r) { return r ? (LANG === 'ja' ? r + '役' : '飾 ' + r) : ''; }
   var $ = function (id) { return document.getElementById(id); };
   var listEl = $('catList'), navEl = $('catNav');
   var navBtns = [], secEls = [];
@@ -356,7 +361,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var h = rows[0].map(function (s) { return String(s || '').trim(); });
     var ci = {
       cat: idx(h, /^分類$/), sub: idx(h, /^子分類/), yr: idx(h, /^年份/), title: idx(h, /名稱/),
-      org: idx(h, /電視台|平台|出版/), role: idx(h, /^角色/), tag: idx(h, /^標記/), pv: idx(h, /^試聽/), pv2: idx(h, /^主表試聽/), alb: idx(h, /^專輯/), cov: idx(h, /^封面/)
+      org: idx(h, /電視台|平台|出版/), role: idx(h, /^角色/), note: idx(h, /^備註/), tag: idx(h, /^標記/), pv: idx(h, /^試聽/), pv2: idx(h, /^主表試聽/), alb: idx(h, /^專輯/), cov: idx(h, /^封面/)
     };
     var lk = [];
     h.forEach(function (x, i) {
@@ -376,7 +381,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
         var u = safeUrl(o.u != null ? r[o.u] : '');
         if (u) links.push({ u: u, l: g(o.l) || '連結' });
       });
-      out.push({ cat: g(ci.cat) || '其他', sub: g(ci.sub), yr: g(ci.yr), title: title, org: g(ci.org), role: g(ci.role), tag: g(ci.tag), pv: safeUrl(g(ci.pv2)) || safeUrl(g(ci.pv)), alb: g(ci.alb), cov: safeUrl(g(ci.cov)), links: links });
+      out.push({ cat: g(ci.cat) || '其他', sub: g(ci.sub), yr: g(ci.yr), title: title, org: g(ci.org), role: g(ci.role), note: g(ci.note), tag: g(ci.tag), pv: safeUrl(g(ci.pv2)) || safeUrl(g(ci.pv)), alb: g(ci.alb), cov: safeUrl(g(ci.cov)), links: links });
     });
     return out;
   }
@@ -411,13 +416,14 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
         '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v8M16 4 6 14"/></svg></a>';
     }).join('') + '</div>';
   }
-  function rowsHTML(items) {
+  function rowsHTML(items, noYear) {
     var prev = null;
-    return '<ul class="rows">' + items.map(function (w) {
+    return '<ul class="rows' + (noYear ? ' ny' : '') + '">' + items.map(function (w) {
       var rep = w.yr && w.yr === prev; prev = w.yr || prev;
       var meta = [];
       if (w.org) meta.push(esc(w.org));
-      if (w.role) meta.push(esc(w.role));
+      if (w.role) meta.push(esc(roleText(w.role)));
+      if (w.note) meta.push(esc(w.note));
       var tags = tagsHTML(w.tag);
       return '<li class="work"><span class="yr' + (rep ? ' rep' : '') + '">' + esc(w.yr) + '</span>' +
         '<div class="main"><div class="wtop"><div class="wt">' + esc(w.title) + '</div>' + playBtn(w) + '</div>' +
@@ -433,35 +439,47 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var tags = tagsHTML(tag) + (w.yr ? '<span class="tag plain">' + esc(w.yr) + '</span>' : '');
     var info = [];
     if (w.org) info.push(esc(w.org));
-    if (w.role) info.push(esc(w.role));
+    if (w.role) info.push(esc(roleText(w.role)));
+    if (w.note) info.push(esc(w.note));
     var cov = w.cov ? '<img class="cov" src="' + esc(w.cov) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '';
     var alb = w.alb ? '<div class="alb">' + esc(w.alb) + '</div>' : '';
     return '<li class="tile"><div class="top">' + cov + '<div class="tt">' + (isStar(w) ? '<span class="stm" title="Center" aria-label="Center">☆</span>' : '') + esc(w.title) + alb + '</div>' + playBtn(w) + '</div>' +
       ((info.length || tags) ? '<div class="meta">' + info.join(' · ') + tags + '</div>' : '') + linksHTML(w.links) + '</li>';
   }
-  function tilesHTML(items, ci) {
+  function groupBy(items, keyFn) {
     var groups = [], map = {};
     items.forEach(function (w) {
-      var k = w.sub || '其他';
+      var k = keyFn(w);
       if (!map[k]) { map[k] = { k: k, items: [] }; groups.push(map[k]); }
       map[k].items.push(w);
     });
+    return groups;
+  }
+  function tabsHTML(groups, ci, def, label, inner) {
+    var cur = activeSub[ci];
+    if (!groups.some(function (g) { return g.k === cur; })) {
+      cur = groups.some(function (g) { return g.k === def; }) ? def : groups[0].k;
+      activeSub[ci] = cur;
+    }
+    var seg = '<div class="seg" role="group" aria-label="' + label + '" data-ci="' + ci + '">' + groups.map(function (g) {
+      return '<button type="button" data-sub="' + esc(g.k) + '" aria-pressed="' + (g.k === cur) + '">' + esc(g.k) + '</button>';
+    }).join('') + '</div>';
+    var panels = groups.map(function (g) {
+      return '<div class="panel" data-sub="' + esc(g.k) + '"' + (g.k === cur ? '' : ' hidden') + '>' + inner(g) + '</div>';
+    }).join('');
+    return seg + panels;
+  }
+  function tilesHTML(items, ci) {
+    var groups = groupBy(items, function (w) { return w.sub || '其他'; });
     groups.sort(function (a, b) {
       var ia = SUB_ORDER.indexOf(a.k), ib = SUB_ORDER.indexOf(b.k);
       return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
     });
-    var cur = activeSub[ci];
-    if (!groups.some(function (g) { return g.k === cur; })) {
-      cur = groups.some(function (g) { return g.k === '全員曲'; }) ? '全員曲' : groups[0].k;
-      activeSub[ci] = cur;
-    }
-    var seg = '<div class="seg" role="group" aria-label="歌曲類型" data-ci="' + ci + '">' + groups.map(function (g) {
-      return '<button type="button" data-sub="' + esc(g.k) + '" aria-pressed="' + (g.k === cur) + '">' + esc(g.k) + '</button>';
-    }).join('') + '</div>';
-    var panels = groups.map(function (g) {
-      return '<div class="panel" data-sub="' + esc(g.k) + '"' + (g.k === cur ? '' : ' hidden') + '><ul class="tiles">' + g.items.map(tileHTML).join('') + '</ul></div>';
-    }).join('');
-    return seg + panels;
+    return tabsHTML(groups, ci, '全員曲', '歌曲類型', function (g) { return '<ul class="tiles">' + g.items.map(tileHTML).join('') + '</ul>'; });
+  }
+  function yearsHTML(items, ci) {
+    var groups = groupBy(items, function (w) { return w.yr || '其他'; });
+    return tabsHTML(groups, ci, '', '年份', function (g) { return rowsHTML(g.items, true); });
   }
   function render(works) {
     stopAudio();
@@ -484,7 +502,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       var tile = items.some(function (w) { return w.sub; });
       var note = items.some(isStar) ? '<p class="catnote"><span class="stm" aria-hidden="true">☆</span>為加藤史帆擔任 Center 的歌曲</p>' : '';
       return '<section class="cat" id="cat-' + i + '"><h2 class="sec">' + esc(c) + '</h2>' + note +
-        (tile ? tilesHTML(items, i) : rowsHTML(items)) + '</section>';
+        (tile ? tilesHTML(items, i) : YEAR_TABS.indexOf(c) >= 0 ? yearsHTML(items, i) : rowsHTML(items)) + '</section>';
     }).join('');
     navBtns = [].slice.call(navEl.querySelectorAll('.chip'));
     secEls = cats.map(function (c, i) { return $('cat-' + i); });
