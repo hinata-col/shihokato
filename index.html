@@ -681,7 +681,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     toastEl.dataset.timer = '';
     toastTimer = setTimeout(function () { toastEl.dataset.show = 'false'; }, 2600);
   }
-  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/' };
+  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/', '相關資源': 'resources/' };
   document.querySelectorAll('[data-go]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var dest = PAGES[a.dataset.go];
