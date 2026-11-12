@@ -272,6 +272,20 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .seg button[aria-pressed="true"]::before{transform:scaleX(1) rotate(-1.5deg)}
 .seg button small{font-size:12px;color:var(--muted);margin-left:3px;font-weight:500}
 .panel[hidden]{display:none}
+.tile .top{display:flex;align-items:flex-start;gap:8px}
+.tile .top .tt{flex:1;min-width:0}
+.pbtn{
+  flex:0 0 auto;width:36px;height:36px;margin:-2px -4px 0 0;border-radius:50%;padding:0;cursor:pointer;
+  display:grid;place-items:center;border:1.5px solid var(--denim);background:var(--surface-2);color:var(--denim);
+}
+.pbtn svg{width:16px;height:16px}
+.pbtn:hover{background:var(--denim);color:var(--denim-ink)}
+.pbtn.on{background:var(--denim);color:var(--denim-ink)}
+.tile.air{border-color:var(--denim);box-shadow:0 0 0 2px var(--coral-soft)}
+.work .pbtn{margin:0}
+.work .wtop{display:flex;align-items:flex-start;gap:8px}
+.work .wtop .wt{flex:1;min-width:0}
+.perr{font-size:12.5px;color:var(--coral)}
 
 </style>
 </head>
@@ -287,7 +301,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     </div>
     <nav class="catnav" id="catNav" aria-label="作品分類" hidden></nav>
     <div id="catList"><div class="state">讀取作品中…</div></div>
-    <p class="foot">作品清單整理自試算表。以官方公告為準。</p>
+    <p class="foot">作品清單整理自試算表，以官方公告為準。30 秒試聽來自 iTunes，歌曲著作權屬於各權利人。</p>
   </main>
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
@@ -340,7 +354,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var h = rows[0].map(function (s) { return String(s || '').trim(); });
     var ci = {
       cat: idx(h, /^分類$/), sub: idx(h, /^子分類/), yr: idx(h, /^年份/), title: idx(h, /名稱/),
-      org: idx(h, /電視台|平台|出版/), role: idx(h, /^角色/), tag: idx(h, /^標記/)
+      org: idx(h, /電視台|平台|出版/), role: idx(h, /^角色/), tag: idx(h, /^標記/), pv: idx(h, /^試聽/)
     };
     var lk = [];
     h.forEach(function (x, i) {
@@ -360,9 +374,33 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
         var u = safeUrl(o.u != null ? r[o.u] : '');
         if (u) links.push({ u: u, l: g(o.l) || '連結' });
       });
-      out.push({ cat: g(ci.cat) || '其他', sub: g(ci.sub), yr: g(ci.yr), title: title, org: g(ci.org), role: g(ci.role), tag: g(ci.tag), links: links });
+      out.push({ cat: g(ci.cat) || '其他', sub: g(ci.sub), yr: g(ci.yr), title: title, org: g(ci.org), role: g(ci.role), tag: g(ci.tag), pv: safeUrl(g(ci.pv)), links: links });
     });
     return out;
+  }
+  var PLAY = '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M6 3.8v12.4a.8.8 0 0 0 1.2.7l10-6.2a.8.8 0 0 0 0-1.4l-10-6.2A.8.8 0 0 0 6 3.8z"/></svg>';
+  var PAUSE = '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><rect x="4.5" y="3.5" width="4" height="13" rx="1.2"/><rect x="11.5" y="3.5" width="4" height="13" rx="1.2"/></svg>';
+  var au = new Audio(), curBtn = null, curUrl = '';
+  au.volume = 0.85;
+  function stopUI() {
+    if (!curBtn) return;
+    curBtn.innerHTML = PLAY; curBtn.classList.remove('on');
+    curBtn.setAttribute('aria-label', curBtn.dataset.l);
+    var t = curBtn.closest('.tile'); if (t) t.classList.remove('air');
+    curBtn = null;
+  }
+  function stopAudio() { au.pause(); curUrl = ''; stopUI(); }
+  au.onended = function () { curUrl = ''; stopUI(); };
+  au.onerror = function () {
+    var b = curBtn; curUrl = ''; stopUI();
+    if (b && b.parentNode && !b.parentNode.querySelector('.perr')) {
+      var e = document.createElement('span'); e.className = 'perr'; e.textContent = '無法播放';
+      b.parentNode.insertBefore(e, b); setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 2500);
+    }
+  };
+  function playBtn(w) {
+    if (!w.pv) return '';
+    return '<button type="button" class="pbtn" data-play="' + esc(w.pv) + '" data-l="試聽 ' + esc(w.title) + '" aria-label="試聽 ' + esc(w.title) + '">' + PLAY + '</button>';
   }
   function linksHTML(links) {
     if (!links.length) return '';
@@ -380,7 +418,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       if (w.role) meta.push(esc(w.role));
       var tags = tagsHTML(w.tag);
       return '<li class="work"><span class="yr' + (rep ? ' rep' : '') + '">' + esc(w.yr) + '</span>' +
-        '<div class="main"><div class="wt">' + esc(w.title) + '</div>' +
+        '<div class="main"><div class="wtop"><div class="wt">' + esc(w.title) + '</div>' + playBtn(w) + '</div>' +
         ((meta.length || tags) ? '<div class="meta">' + meta.join(' · ') + tags + '</div>' : '') +
         linksHTML(w.links) + '</div></li>';
     }).join('') + '</ul>';
@@ -394,7 +432,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var info = [];
     if (w.org) info.push(esc(w.org));
     if (w.role) info.push(esc(w.role));
-    return '<li class="tile"><div class="tt">' + (isStar(w) ? '<span class="stm" title="Center" aria-label="Center">☆</span>' : '') + esc(w.title) + '</div>' +
+    return '<li class="tile"><div class="top"><div class="tt">' + (isStar(w) ? '<span class="stm" title="Center" aria-label="Center">☆</span>' : '') + esc(w.title) + '</div>' + playBtn(w) + '</div>' +
       ((info.length || tags) ? '<div class="meta">' + info.join(' · ') + tags + '</div>' : '') + linksHTML(w.links) + '</li>';
   }
   function tilesHTML(items, ci) {
@@ -422,6 +460,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     return seg + panels;
   }
   function render(works) {
+    stopAudio();
     var cats = [], map = {};
     works.forEach(function (w) {
       if (!map[w.cat]) { map[w.cat] = []; cats.push(w.cat); }
@@ -479,8 +518,23 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     secEls[i].scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
   });
   listEl.addEventListener('click', function (e) {
+    var pbn = e.target.closest('.pbtn');
+    if (pbn) {
+      if (curBtn === pbn) { stopAudio(); return; }
+      au.pause(); stopUI();
+      var u = pbn.dataset.play; au.src = u; curUrl = u;
+      var pr = au.play();
+      var mark = function () {
+        if (curUrl !== u) return;
+        curBtn = pbn; pbn.innerHTML = PAUSE; pbn.classList.add('on'); pbn.setAttribute('aria-label', '暫停 ' + pbn.dataset.l.replace(/^試聽 /, ''));
+        var t = pbn.closest('.tile'); if (t) t.classList.add('air');
+      };
+      if (pr && pr.then) pr.then(mark).catch(function () { au.onerror(); }); else mark();
+      return;
+    }
     var b = e.target.closest('.seg button'); if (!b) return;
     var seg = b.parentNode, ci = seg.dataset.ci, sec = seg.parentNode;
+    stopAudio();
     activeSub[ci] = b.dataset.sub;
     [].forEach.call(seg.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
     [].forEach.call(sec.querySelectorAll('.panel'), function (p) { p.hidden = p.dataset.sub !== b.dataset.sub; });
