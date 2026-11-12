@@ -213,6 +213,14 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .pop .pt{font-weight:700;color:var(--denim);margin-bottom:2px}
 @keyframes popin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.pop{animation:none}.dd svg{transition:none}}
+
+.thumbs{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px}
+.thumbs button{flex:0 0 auto;width:72px;height:72px;padding:0;border:1.5px solid #2b3a67;border-radius:6px;background:#fff;overflow:hidden;cursor:zoom-in;box-shadow:0 3px 6px -3px rgba(30,40,90,.4)}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.artlb{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px 16px;background:rgba(20,28,60,.82)}
+.artlb img{max-width:100%;max-height:78vh;background:#fff;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.artlb p{margin:0;color:#fff;font-size:14px;text-align:center}
+.artlb button{position:absolute;top:max(12px,env(safe-area-inset-top,0px));right:14px;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#2b3a67;font-size:22px;line-height:1;cursor:pointer}
 .polaroid{position:relative;width:min(72%,300px);margin:26px auto 6px;padding:10px 10px 34px;background:#fff;border-radius:3px;transform:rotate(-1.2deg);box-shadow:0 14px 22px -14px var(--shadow),0 1px 3px var(--shadow)}
 .polaroid::before{content:"";position:absolute;top:-12px;left:50%;width:86px;height:23px;margin-left:-43px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.75) 0 6px,rgba(255,255,255,.4) 6px 12px),rgba(246,209,222,.7);border:1px solid rgba(0,0,0,.06);transform:rotate(2deg)}
 .polaroid img{display:block;width:100%;height:auto;border-radius:1px;background:var(--surface-2)}
@@ -291,7 +299,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       <li data-icon="tennis"><b>運動</b>小學時練過網球，運動神經好，曾在節目競賽中取得 50 公尺短跑優異成績（<a class="xl" href="https://www.bilibili.com/video/BV1Ex411E7a4/?t=859" target="_blank" rel="noopener noreferrer">50m 賽跑 7 秒 62</a>）。</li>
       <li data-icon="movie"><b>主題樂園</b>喜歡主題樂園、《哈利波特》、《星際大戰》、漫威系列，假期常去迪士尼或環球影城。</li>
       <li data-icon="anime"><b>動漫</b>喜歡動漫，尤其《新世紀福音戰士》，擅長模仿男主角，並自稱角色「<a class="xl" href="https://h46sub.cc/index.php/vod/play/id/52/sid/1/nid/150.html" target="_blank" rel="noopener noreferrer">加藤真嗣</a>」。</li>
-      <li data-icon="brush"><b>藝術</b>有藝術天分，曾在才能檢定節目中獲專家認可，最廣為人知的是獨特畫風的似顏繪。</li>
+      <li data-icon="brush"><b>藝術</b>有藝術天分，曾在才能檢定節目中獲專家認可，最廣為人知的是獨特畫風的似顏繪。<span class="gal" hidden><a href="art/talent.jpg" data-t="art/talent-s.jpg" data-c="才能檢定節目中的作品：石頭畫、水彩畫、橡皮章">畫面</a><a href="art/tv.jpg" data-t="art/tv-s.jpg" data-c="電視節目《ひらかな推し》（テレ東）">畫面</a><a href="art/rec.jpg" data-t="art/rec-s.jpg" data-c="廣播節目《レコメン!》上畫的似顏繪">畫面</a><a href="art/badge.jpg" data-t="art/badge-s.jpg" data-c="畢業典禮週邊：她為所有成員畫的似顏繪徽章">畫面</a></span></li>
     </ul>
 
     <h2 class="bsec">經歷</h2>
@@ -340,19 +348,39 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var items = [].slice.call(src.querySelectorAll(':scope > li')).map(function (li) {
       var b = li.querySelector('b'), t = b ? b.textContent : '';
       var clone = li.cloneNode(true); var cb = clone.querySelector('b'); if (cb) cb.remove();
-      return { k: li.getAttribute('data-icon'), t: t, h: clone.innerHTML };
+      var gl = clone.querySelector('.gal'), g = [];
+      if (gl) { [].forEach.call(gl.querySelectorAll('a'), function (x) { g.push({ f: x.getAttribute('href'), t: x.getAttribute('data-t'), c: x.getAttribute('data-c') || '' }); }); gl.remove(); }
+      return { k: li.getAttribute('data-icon'), t: t, h: clone.innerHTML, g: g };
     }).filter(function (d) { return ICON[d.k]; });
     if (!items.length) return;
     box.innerHTML = items.map(function (d, i) {
       return '<button type="button" class="dd" data-i="' + i + '" aria-expanded="false" aria-label="' + d.t + '" style="--r:' + ROT[i % ROT.length] + 'deg"><svg viewBox="0 0 64 64" aria-hidden="true">' + ICON[d.k] + '</svg><span>' + d.t + '</span></button>';
     }).join('');
     var pop = null, curB = null;
+    function lightbox(x) {
+      var lb = document.createElement('div'); lb.className = 'artlb'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true');
+      var im = document.createElement('img'); im.src = x.f; im.alt = x.c;
+      var cp = document.createElement('p'); cp.textContent = x.c;
+      var cb = document.createElement('button'); cb.type = 'button'; cb.setAttribute('aria-label', '關閉'); cb.textContent = '×';
+      lb.appendChild(im); if (x.c) lb.appendChild(cp); lb.appendChild(cb);
+      function shut() { lb.remove(); document.removeEventListener('keydown', esc, true); }
+      function esc(e) { if (e.key === 'Escape') { e.stopPropagation(); shut(); } }
+      lb.addEventListener('click', function (e) { if (e.target !== im) shut(); });
+      document.addEventListener('keydown', esc, true);
+      document.body.appendChild(lb); cb.focus();
+    }
     function close() { if (pop) { pop.remove(); pop = null; } if (curB) { curB.setAttribute('aria-expanded', 'false'); curB = null; } }
     function open(b) {
       close(); curB = b; b.setAttribute('aria-expanded', 'true');
       var d = items[+b.dataset.i];
       pop = document.createElement('div'); pop.className = 'pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', d.t);
       pop.innerHTML = '<div class="pt">' + d.t + '</div>' + d.h;
+      if (d.g.length) {
+        var th = document.createElement('div'); th.className = 'thumbs';
+        th.innerHTML = d.g.map(function (x, n) { return '<button type="button" data-n="' + n + '" aria-label="放大：' + x.c.replace(/"/g, '') + '"><img src="' + x.t + '" alt="" loading="lazy"></button>'; }).join('');
+        th.addEventListener('click', function (e) { var bt = e.target.closest('button'); if (bt) lightbox(d.g[+bt.dataset.n]); });
+        pop.appendChild(th);
+      }
       box.appendChild(pop);
       var bw = box.clientWidth, pw = pop.offsetWidth;
       var cx = b.offsetLeft + b.offsetWidth / 2, left = Math.max(10, Math.min(bw - pw - 10, cx - pw / 2));
@@ -364,7 +392,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       if (b) { b === curB ? close() : open(b); return; }
       if (!e.target.closest('.pop')) close();
     });
-    document.addEventListener('click', function (e) { if (!box.contains(e.target)) close(); });
+    document.addEventListener('click', function (e) { if (!box.contains(e.target) && !e.target.closest('.artlb')) close(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
     src.hidden = true; box.hidden = false; document.getElementById('doodleHint').hidden = false;
   })();
