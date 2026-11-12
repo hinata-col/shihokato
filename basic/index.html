@@ -404,10 +404,14 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
   });
   if (!data.length) return;
   var rail = document.getElementById('rail'), body = document.getElementById('lifeBody');
-  rail.innerHTML = data.map(function (d, i) {
-    return '<button type="button" class="stop" role="tab" data-i="' + i + '"><span class="nd"></span><span class="yy">' + d.y + '</span><span class="lb">' + d.l + '</span></button>';
-  }).join('');
-  var stops = [].slice.call(rail.querySelectorAll('.stop')), cur = -1, lock = false, lockT = 0;
+  var stops = [], cur = -1, lock = false, lockT = 0;
+  function build() {
+    rail.innerHTML = data.map(function (d, i) {
+      return '<button type="button" class="stop" role="tab" data-i="' + i + '"><span class="nd"></span><span class="yy">' + d.y + '</span><span class="lb">' + d.l + '</span></button>';
+    }).join('');
+    stops = [].slice.call(rail.querySelectorAll('.stop')); cur = -1;
+  }
+  build();
   function show(i, dir) {
     if (i === cur) return;
     cur = i;
@@ -449,6 +453,83 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
   }, { passive: true });
   src.hidden = true; life.hidden = false;
   show(0, 0); centerOn(0, false);
+
+  /* 年表資料來源：試算表「基本資料年表」分頁（網頁內建內容為備援） */
+  var TL_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwvy-Oyq413ORq1Lxo22qGb6VnLp-1Zi2UyfDgIuwAsneVJh0XHZhwm5xagSJ7QGkxFHpHrsN4LKoD/pub?gid=819370905&single=true&output=csv';
+  var TL_KEY = 'shk-timeline-csv-v1';
+
+  function parseCSV(t) {
+    var rows = [], row = [], f = '', q = false;
+    for (var i = 0; i < t.length; i++) {
+      var c = t[i];
+      if (q) {
+        if (c === '"') { if (t[i + 1] === '"') { f += '"'; i++; } else q = false; }
+        else f += c;
+      } else if (c === '"') q = true;
+      else if (c === ',') { row.push(f); f = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && t[i + 1] === '\n') i++;
+        row.push(f); f = ''; rows.push(row); row = [];
+      } else f += c;
+    }
+    if (f !== '' || row.length) { row.push(f); rows.push(row); }
+    return rows.filter(function (r) { return r.some(function (x) { return String(x).trim() !== ''; }); });
+  }
+  function idx(h, re) { for (var i = 0; i < h.length; i++) if (re.test(h[i])) return i; return -1; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function safeUrl(u) { u = String(u || '').trim(); return /^https?:\/\//i.test(u) ? u : ''; }
+  function getCache(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function setCache(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  var ARROW = '<svg class="go" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v8M16 4 6 14"/></svg>';
+  var smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var toTop = document.getElementById('toTop');
+  function tagClass(t) { return t === '主演' ? 'lead' : t === '☆' ? 'star' : /期生/.test(t) ? 'gen' : 'plain'; }
+  function tagsHTML(s) {
+    return String(s || '').split(/[、,，\s]+/).filter(Boolean).map(function (t) {
+      return '<span class="tag ' + tagClass(t) + '">' + esc(t) + '</span>';
+    }).join('');
+  }
+  function onScrollTop() { toTop.dataset.show = window.pageYOffset > 480 ? 'true' : 'false'; }
+  toTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' }); });
+
+  function linkify(t) {
+    return esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, function (m, a, u) {
+      return '<a class="xl" href="' + u + '" target="_blank" rel="noopener noreferrer">' + a + '</a>';
+    });
+  }
+  function toData(rows) {
+    if (!rows.length) return [];
+    var h = rows[0].map(function (x) { return String(x || '').trim(); });
+    var ci = { y: idx(h, /^年份$/), l: idx(h, /^年份標籤|^標籤/), d: idx(h, /^日期/), c: idx(h, /^內容/) };
+    if (ci.y < 0 || ci.c < 0) return [];
+    var out = [], map = {};
+    rows.slice(1).forEach(function (r) {
+      function g(i) { return i >= 0 && r[i] != null ? String(r[i]).trim() : ''; }
+      var y = g(ci.y), c = g(ci.c); if (!y || !c) return;
+      if (!map[y]) { map[y] = { y: y, l: '', items: [] }; out.push(map[y]); }
+      if (!map[y].l) map[y].l = g(ci.l);
+      map[y].items.push('<span>' + (g(ci.d) ? '<small>' + esc(g(ci.d)) + '</small>' : '') + linkify(c) + '</span>');
+    });
+    out.sort(function (a, b) { return (parseInt(a.y, 10) || 0) - (parseInt(b.y, 10) || 0); });
+    return out.map(function (o) { return { y: o.y, l: o.l, h: o.items.join('') }; });
+  }
+  function apply(next) {
+    if (!next.length) return;
+    var keep = cur >= 0 && data[cur] ? data[cur].y : null;
+    data = next; build();
+    var i = 0; if (keep) data.forEach(function (d, j) { if (d.y === keep) i = j; });
+    show(i, 0); centerOn(i, false);
+  }
+  var c0 = getCache(TL_KEY);
+  if (c0) { try { apply(toData(parseCSV(c0))); } catch (e) {} }
+  fetch(TL_URL, { cache: 'no-cache' }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.text();
+  }).then(function (t) {
+    var next = toData(parseCSV(t));
+    if (!next.length) throw new Error('empty');
+    setCache(TL_KEY, t); apply(next);
+  }).catch(function (e) { if (window.console) console.warn('年表讀取失敗，使用內建內容', e); });
 })();
 </script>
 </body>
