@@ -263,7 +263,6 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     </div>
     <nav class="catnav" id="catNav" aria-label="作品分類" hidden></nav>
     <div id="catList"><div class="state">讀取作品中…</div></div>
-    <p class="foot">作品以官方公告為準。30 秒試聽來自 iTunes，歌曲著作權屬於各權利人。</p>
   </main>
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
@@ -459,6 +458,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       var items = map[c];
       var tile = items.some(function (w) { return w.sub; });
       var note = items.some(isStar) ? '<p class="catnote"><span class="stm" aria-hidden="true">☆</span>為加藤史帆擔任 Center 的歌曲</p>' : '';
+      if (items.some(function (w) { return w.pv; })) note += '<p class="catnote">30 秒試聽來自 iTunes，歌曲著作權屬於各權利人。</p>';
       return '<section class="cat" id="cat-' + i + '"><h2 class="sec">' + esc(c) + '</h2>' + note +
         (tile ? tilesHTML(items, i) : YEAR_TABS.indexOf(c) >= 0 ? yearsHTML(items, i) : rowsHTML(items)) + '</section>';
     }).join('');

@@ -339,11 +339,11 @@ a{color:inherit}
 }
 
 /* 底部：非官方聲明 */
-.foot{padding-block:6px 18px}
+.foot{padding-block:6px calc(84px + env(safe-area-inset-bottom,0px))}
 .foot-in{
   max-width:1120px;margin:0 auto;
   padding-left:max(16px,env(safe-area-inset-left,0px));
-  padding-right:max(84px,env(safe-area-inset-right,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
   display:flex;justify-content:center;
 }
 .fine{margin:0;font-size:12px;color:var(--ink-soft);text-align:center}
