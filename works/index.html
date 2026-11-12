@@ -286,6 +286,8 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .work .wtop{display:flex;align-items:flex-start;gap:8px}
 .work .wtop .wt{flex:1;min-width:0}
 .perr{font-size:12.5px;color:var(--coral)}
+.tile .cov{flex:0 0 auto;width:48px;height:48px;border-radius:8px;object-fit:cover;background:var(--surface-2);border:1px solid var(--line)}
+.tile .alb{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
 
 </style>
 </head>
@@ -354,7 +356,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var h = rows[0].map(function (s) { return String(s || '').trim(); });
     var ci = {
       cat: idx(h, /^分類$/), sub: idx(h, /^子分類/), yr: idx(h, /^年份/), title: idx(h, /名稱/),
-      org: idx(h, /電視台|平台|出版/), role: idx(h, /^角色/), tag: idx(h, /^標記/), pv: idx(h, /^試聽/)
+      org: idx(h, /電視台|平台|出版/), role: idx(h, /^角色/), tag: idx(h, /^標記/), pv: idx(h, /^試聽/), pv2: idx(h, /^主表試聽/), alb: idx(h, /^專輯/), cov: idx(h, /^封面/)
     };
     var lk = [];
     h.forEach(function (x, i) {
@@ -374,7 +376,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
         var u = safeUrl(o.u != null ? r[o.u] : '');
         if (u) links.push({ u: u, l: g(o.l) || '連結' });
       });
-      out.push({ cat: g(ci.cat) || '其他', sub: g(ci.sub), yr: g(ci.yr), title: title, org: g(ci.org), role: g(ci.role), tag: g(ci.tag), pv: safeUrl(g(ci.pv)), links: links });
+      out.push({ cat: g(ci.cat) || '其他', sub: g(ci.sub), yr: g(ci.yr), title: title, org: g(ci.org), role: g(ci.role), tag: g(ci.tag), pv: safeUrl(g(ci.pv2)) || safeUrl(g(ci.pv)), alb: g(ci.alb), cov: safeUrl(g(ci.cov)), links: links });
     });
     return out;
   }
@@ -432,7 +434,9 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
     var info = [];
     if (w.org) info.push(esc(w.org));
     if (w.role) info.push(esc(w.role));
-    return '<li class="tile"><div class="top"><div class="tt">' + (isStar(w) ? '<span class="stm" title="Center" aria-label="Center">☆</span>' : '') + esc(w.title) + '</div>' + playBtn(w) + '</div>' +
+    var cov = w.cov ? '<img class="cov" src="' + esc(w.cov) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '';
+    var alb = w.alb ? '<div class="alb">' + esc(w.alb) + '</div>' : '';
+    return '<li class="tile"><div class="top">' + cov + '<div class="tt">' + (isStar(w) ? '<span class="stm" title="Center" aria-label="Center">☆</span>' : '') + esc(w.title) + alb + '</div>' + playBtn(w) + '</div>' +
       ((info.length || tags) ? '<div class="meta">' + info.join(' · ') + tags + '</div>' : '') + linksHTML(w.links) + '</li>';
   }
   function tilesHTML(items, ci) {
