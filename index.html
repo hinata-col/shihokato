@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{color-scheme:light;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{color-scheme:light;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}img.fx:not([data-ph]){opacity:0}
+img.fx.fo:not([data-ph]){opacity:1;transition:opacity .45s ease}
+img[data-ph].fo{animation:phin .45s ease}
+@keyframes phin{from{opacity:.55}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){img.fx.fo:not([data-ph]){transition:none}img[data-ph].fo{animation:none}}
+</style>
 </head>
 <body>
 <title>加藤史帆新手包</title>
@@ -531,7 +536,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
             <svg class="doodle" style="left:44%;top:84%;width:5%" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.3l7.1-.7z"/></svg>
 
             <a class="sticker" href="#basic" data-go="基本資料" style="--x:9%;--y:4%;--w:36%;--r:-4deg;--ar:704/889">
-              <span class="shape has-img"><img class="photo" src="img/sticker-basic.webp" width="704" height="889" alt="" loading="lazy" decoding="async"><span class="gloss"></span></span>
+              <span class="shape has-img"><img class="photo" src="img/sticker-basic.webp" width="704" height="889" alt="" loading="lazy" decoding="async" data-ph style="background:url(data:image/png;base64,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) center/contain no-repeat"><span class="gloss"></span></span>
               <span class="label">基本資料</span>
             </a>
 
@@ -826,5 +831,6 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
 })();
 </script>
 
+<script>(function(){function h(i){if(i.__f)return;i.__f=1;if(i.complete&&i.naturalWidth)return;i.classList.add('fx');function ok(){i.classList.add('fo');if(i.dataset.ph!=null)setTimeout(function(){i.style.backgroundImage='none'},500)}i.addEventListener('load',ok);i.addEventListener('error',function(){i.classList.add('fo')});if(i.complete&&i.naturalWidth)ok()}Array.prototype.forEach.call(document.images,h);if(window.MutationObserver)new MutationObserver(function(m){m.forEach(function(r){Array.prototype.forEach.call(r.addedNodes,function(n){if(n.nodeType!==1)return;if(n.tagName==='IMG')h(n);else if(n.querySelectorAll)Array.prototype.forEach.call(n.querySelectorAll('img'),h)})})}).observe(document.documentElement,{childList:true,subtree:true})})();</script>
 </body>
 </html>

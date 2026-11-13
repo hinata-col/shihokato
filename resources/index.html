@@ -212,6 +212,11 @@ a.rl:hover .rn{text-decoration:underline;text-underline-offset:3px}
 a.rl:hover svg{opacity:1}
 @media (prefers-reduced-motion:reduce){.note{transform:none}}
 
+img.fx:not([data-ph]){opacity:0}
+img.fx.fo:not([data-ph]){opacity:1;transition:opacity .45s ease}
+img[data-ph].fo{animation:phin .45s ease}
+@keyframes phin{from{opacity:.55}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){img.fx.fo:not([data-ph]){transition:none}img[data-ph].fo{animation:none}}
 </style>
 </head>
 <body>
@@ -231,6 +236,7 @@ a.rl:hover svg{opacity:1}
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
 <script src="../nav.js"></script>
+<script>(function(){function h(i){if(i.__f)return;i.__f=1;if(i.complete&&i.naturalWidth)return;i.classList.add('fx');function ok(){i.classList.add('fo');if(i.dataset.ph!=null)setTimeout(function(){i.style.backgroundImage='none'},500)}i.addEventListener('load',ok);i.addEventListener('error',function(){i.classList.add('fo')});if(i.complete&&i.naturalWidth)ok()}Array.prototype.forEach.call(document.images,h);if(window.MutationObserver)new MutationObserver(function(m){m.forEach(function(r){Array.prototype.forEach.call(r.addedNodes,function(n){if(n.nodeType!==1)return;if(n.tagName==='IMG')h(n);else if(n.querySelectorAll)Array.prototype.forEach.call(n.querySelectorAll('img'),h)})})}).observe(document.documentElement,{childList:true,subtree:true})})();</script>
 <script>
 (function () {
   'use strict';

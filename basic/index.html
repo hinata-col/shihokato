@@ -263,6 +263,11 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .tl .ev span{display:block}
 .tl .ev small{display:inline-block;margin-right:7px;padding:0 9px;border-radius:999px;background:#e1eafb;color:var(--denim);font-size:12.5px;font-weight:700;line-height:1.7;white-space:nowrap}
 
+img.fx:not([data-ph]){opacity:0}
+img.fx.fo:not([data-ph]){opacity:1;transition:opacity .45s ease}
+img[data-ph].fo{animation:phin .45s ease}
+@keyframes phin{from{opacity:.55}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){img.fx.fo:not([data-ph]){transition:none}img[data-ph].fo{animation:none}}
 </style>
 </head>
 <body>
@@ -275,7 +280,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       <h1>基本資料</h1>
       <div class="sticker-slot" aria-hidden="true">貼紙圖<br>基本資料</div>
     </div>
-    <figure class="polaroid"><img src="portrait.jpg" width="900" height="1125" alt="加藤史帆 官方照" decoding="async"></figure>
+    <figure class="polaroid"><img src="portrait.jpg" width="900" height="1125" alt="加藤史帆 官方照" decoding="async" data-ph style="background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAUABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwB9yxVIo0cI0rhAx7UW6sTNBK4kkhbBYdwRkVl3V3v1CIScwxSA4A6+tSWd2TrEjIMJOx49B2qbMq6sZ0vE7f7xqfTT/p8f0P8AKiir6En/2Q==) center/cover no-repeat"></figure>
     <div class="hero">
       <div class="nm">加藤史帆</div>
       <div class="rd">かとう しほ ／ KATO SHIHO</div>
@@ -333,6 +338,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
 <script src="../nav.js"></script>
+<script>(function(){function h(i){if(i.__f)return;i.__f=1;if(i.complete&&i.naturalWidth)return;i.classList.add('fx');function ok(){i.classList.add('fo');if(i.dataset.ph!=null)setTimeout(function(){i.style.backgroundImage='none'},500)}i.addEventListener('load',ok);i.addEventListener('error',function(){i.classList.add('fo')});if(i.complete&&i.naturalWidth)ok()}Array.prototype.forEach.call(document.images,h);if(window.MutationObserver)new MutationObserver(function(m){m.forEach(function(r){Array.prototype.forEach.call(r.addedNodes,function(n){if(n.nodeType!==1)return;if(n.tagName==='IMG')h(n);else if(n.querySelectorAll)Array.prototype.forEach.call(n.querySelectorAll('img'),h)})})}).observe(document.documentElement,{childList:true,subtree:true})})();</script>
 <script>
 (function () {
   var t = document.getElementById('toTop');
