@@ -8,7 +8,7 @@
     { n: '作品', u: 'works/' },
     { n: '行程', u: 'schedule/' },
     { n: '各種歡樂', u: 'fun/' },
-    { n: '彩弘祭典', u: 'festival/' },
+    { n: '彩弘祭典', u: 'ayahiro2/' },
     { n: '訪談報導', u: 'interviews/' },
     { n: '私服穿搭' },
     { n: '相關資源', u: 'resources/' }
