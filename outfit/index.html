@@ -326,8 +326,8 @@ img[data-ph].fo{animation:phin .45s ease}
     return SEASONS.filter(function (x) { return s.indexOf(x) >= 0; });
   }
   var PEOPLE = {
-    '加藤史帆': { en: 'SHIHO KATO', tag: '#かとしふく' },
-    '佐々木久美': { en: 'KUMI SASAKI', tag: '#佐々木久美' }
+    '加藤史帆': { bg: '#e8f0fd', grid: 'rgba(127,166,234,.35)', ink: '#2b3a67', acc: '#7fa6ea', fs: 92, fl: 16, heart: false, en: 'SHIHO KATO', lead: ['#加藤史帆', '#かとしふく'], card: '#かとしふく', ig: '#shihogram', blog: '#shihoblog' },
+    '佐々木久美': { bg: '#f1f0fe', grid: 'rgba(142,200,250,.5)', ink: '#5b3fa8', acc: '#8fd0fb', fs: 86, fl: 14, heart: true, en: 'KUMI SASAKI', lead: ['#佐々木久美'], card: '#佐々木久美', ig: '#kumigram', blog: '#kumiblog' }
   };
   function normW(w) { w = String(w || '').trim(); if (/史/.test(w) || /shiho/i.test(w)) return '加藤史帆'; if (/久美|kumi/i.test(w)) return '佐々木久美'; return w || '加藤史帆'; }
   function igCode(u) { var m = /instagram\.com\/(p|reel|reels|tv)\/([\w-]+)/i.exec(u); return m ? { kind: m[1].toLowerCase() === 'p' ? 'p' : 'reel', code: m[2] } : null; }
@@ -484,12 +484,13 @@ img[data-ph].fo{animation:phin .45s ease}
   }
   function shareText(it) {
     var pe = PEOPLE[it.w] || PEOPLE['加藤史帆'];
-    var t = TXT[siteLang()] + '\n' + pe.tag + ' ' + (it.ig ? '#shihogram' : '#shihoblog');
+    var t = TXT[siteLang()] + '\n' + pe.lead.concat(it.ig ? pe.ig : pe.blog).join(' ');
     if (it.ig) t += '\n' + 'https://www.instagram.com/' + it.ig.kind + '/' + it.ig.code + '/';
     return t;
   }
   function isR2(u) { return /^https:\/\/pub-[\w-]+\.r2\.dev\//i.test(u || ''); }
   var STAR = 'M12 1.5l3 7.2 7.8.6-5.9 5.1 1.8 7.6L12 17.9 5.3 22l1.8-7.6L1.2 9.3 9 8.7z';
+  var HEART = 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z';
   var SPARK = 'M12 0c.8 6.5 4.5 10.2 12 12-7.5 1.8-11.2 5.5-12 12-.8-6.5-4.5-10.2-12-12C7.5 10.2 11.2 6.5 12 0z';
   function glyph(g, path, x, y, sz, col, rot) {
     g.save(); g.translate(x + sz / 2, y + sz / 2); g.rotate((rot || 0) * Math.PI / 180); g.scale(sz / 24, sz / 24); g.translate(-12, -12);
@@ -504,9 +505,9 @@ img[data-ph].fo{animation:phin .45s ease}
     });
     return Promise.all([ld, fl]).then(function (v) {
       var im = v[0], W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
-      var g = c.getContext('2d');
-      g.fillStyle = '#e8f0fd'; g.fillRect(0, 0, W, H);
-      g.strokeStyle = 'rgba(127,166,234,.35)'; g.lineWidth = 2; g.beginPath();
+      var g = c.getContext('2d'), pe = PEOPLE[it.w] || PEOPLE['加藤史帆'], SH = pe.heart ? HEART : STAR;
+      g.fillStyle = pe.bg; g.fillRect(0, 0, W, H);
+      g.strokeStyle = pe.grid; g.lineWidth = 2; g.beginPath();
       for (var x = 0; x <= W; x += 54) { g.moveTo(x, 0); g.lineTo(x, H); }
       for (var y = 0; y <= H; y += 54) { g.moveTo(0, y); g.lineTo(W, y); }
       g.stroke();
@@ -519,28 +520,27 @@ img[data-ph].fo{animation:phin .45s ease}
       g.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, -bw / 2, -bh / 2, bw, bh);
       g.restore();
       /* 直排 SHIHO KATO */
-      g.fillStyle = '#2b3a67'; g.font = '700 92px ' + LAT; g.textBaseline = 'middle'; g.textAlign = 'center';
-      var pe = PEOPLE[it.w] || PEOPLE['加藤史帆'];
+      g.fillStyle = pe.ink; g.font = '700 ' + pe.fs + 'px ' + LAT; g.textBaseline = 'middle'; g.textAlign = 'center';
       var s1 = pe.en, yy = 90;
       for (var i = 0; i < s1.length; i++) {
         var ch = s1[i], wd = g.measureText(ch).width;
         g.save(); g.translate(W - 76 - 46, yy + (ch === ' ' ? 46 : wd / 2)); g.rotate(Math.PI / 2); g.fillText(ch === ' ' ? '' : ch, 0, 0); g.restore();
-        yy += (ch === ' ' ? 46 : wd) + 16;
+        yy += (ch === ' ' ? 46 : wd) + pe.fl;
       }
       /* 名字標籤 */
       g.save(); g.translate(100, 1150); g.rotate(-2 * Math.PI / 180);
       g.font = '900 64px ' + SERIF; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
       var tw = g.measureText(it.w || '加藤史帆').width, lw = tw + 68, lh = 96;
-      g.fillStyle = '#7fa6ea'; g.fillRect(6, 6, lw, lh);
-      g.fillStyle = '#2b3a67'; g.fillRect(0, 0, lw, lh);
+      g.fillStyle = pe.acc; g.fillRect(6, 6, lw, lh);
+      g.fillStyle = pe.ink; g.fillRect(0, 0, lw, lh);
       g.fillStyle = '#fff'; g.fillText(it.w || '加藤史帆', 34, 72);
       g.restore();
       /* hashtag */
-      g.fillStyle = '#2b3a67'; g.textAlign = 'right'; g.font = '500 30px ' + SERIF; g.textBaseline = 'alphabetic';
-      g.fillText(pe.tag, W - 76, H - 72 - 45 + 24); g.fillText(it.ig ? '#shihogram' : '#shihoblog', W - 76, H - 72 + 24);
+      g.fillStyle = pe.ink; g.textAlign = 'right'; g.font = '500 30px ' + SERIF; g.textBaseline = 'alphabetic';
+      g.fillText(pe.card, W - 76, H - 72 - 45 + 24); g.fillText(it.ig ? pe.ig : pe.blog, W - 76, H - 72 + 24);
       /* 星星 */
-      glyph(g, STAR, 850, 640, 64, '#2b3a67', 10); glyph(g, SPARK, 900, 820, 44, '#fff'); glyph(g, STAR, 830, 980, 40, '#7fa6ea', -12);
-      glyph(g, SPARK, 80, 60, 36, '#7fa6ea'); glyph(g, STAR, 520, 1190, 34, '#7fa6ea', 6); glyph(g, SPARK, 560, 1250, 26, '#2b3a67');
+      glyph(g, SH, 850, 640, 64, pe.ink, 10); glyph(g, SPARK, 900, 820, 44, '#fff'); glyph(g, SH, 830, 980, 40, pe.acc, -12);
+      glyph(g, SPARK, 80, 60, 36, pe.acc); glyph(g, SH, 520, 1190, 34, pe.acc, 6); glyph(g, SPARK, 560, 1250, 26, pe.ink);
       return new Promise(function (ok, no) { c.toBlob(function (bl) { bl ? ok(bl) : no(new Error('blob')); }, 'image/jpeg', 0.92); });
     });
   }
