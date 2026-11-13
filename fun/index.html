@@ -209,7 +209,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .fth{position:relative;display:block;aspect-ratio:16/10;overflow:hidden;background:#dfe7f6;border-radius:2px}
 .fth img{display:block;width:100%;height:100%;object-fit:cover}
 .fth.nopic{display:grid;place-items:center;background:repeating-linear-gradient(135deg,rgba(255,255,255,.55) 0 8px,transparent 8px 16px),linear-gradient(160deg,#cfdcf5,#b9cbee);color:#3f5a96;font-weight:700;letter-spacing:.08em;font-size:15px}
-.fplay{position:absolute;right:7px;bottom:7px;width:26px;height:26px;border-radius:50%;background:rgba(20,30,60,.62);display:grid;place-items:center}
+.fplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:rgba(20,30,60,.62);display:grid;place-items:center}
 .fplay::after{content:"";margin-left:2px;border-left:8px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent}
 .fpf{position:absolute;left:6px;top:6px;padding:1px 7px;border-radius:999px;background:rgba(255,255,255,.92);color:#2b3a67;font-size:10.5px;font-weight:700;letter-spacing:.04em;line-height:17px}
 .ft{font-size:13.5px;font-weight:700;line-height:1.5;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;padding:0 2px}
@@ -306,7 +306,7 @@ img[data-ph].fo{animation:phin .45s ease}
       function g(i) { return i >= 0 && r[i] != null ? String(r[i]).trim() : ''; }
       var u = safeUrl(g(ci.u)), t = g(ci.t);
       if (!u || !t) return;
-      out.push({ c: g(ci.c) || '其他', t: t, u: u, n: g(ci.n), pf: platform(u), man: !!safeUrl(g(ci.p)), img: (safeUrl(g(ci.p)) || safeUrl(g(ci.a))).replace(/^http:\/\//i, 'https://') || ytThumb(u), o: n });
+      out.push({ c: g(ci.c) || '其他', t: t, u: u, n: g(ci.n), pf: platform(u), img: (safeUrl(g(ci.p)) || safeUrl(g(ci.a))).replace(/^http:\/\//i, 'https://') || ytThumb(u), o: n });
     });
     return out;
   }
@@ -315,7 +315,7 @@ img[data-ph].fo{animation:phin .45s ease}
       ? '<img src="' + esc(it.img) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
       : '';
     return '<li><a class="fc" href="' + esc(it.u) + '" target="_blank" rel="noopener noreferrer">' +
-      '<span class="fth' + (it.img ? '' : ' nopic') + '">' + (it.img ? pic : esc(it.pf)) + '<span class="fpf">' + esc(it.pf) + '</span>' + (it.man ? '' : '<span class="fplay" aria-hidden="true"></span>') + '</span>' +
+      '<span class="fth' + (it.img ? '' : ' nopic') + '">' + (it.img ? pic : esc(it.pf)) + '<span class="fpf">' + esc(it.pf) + '</span>' + (/^https:\/\/pub-/i.test(it.img) ? '' : '<span class="fplay" aria-hidden="true"></span>') + '</span>' +
       '<span class="ft">' + esc(it.t) + '</span>' + (it.n ? '<span class="fn">' + esc(it.n) + '</span>' : '') + '</a></li>';
   }
   var HLC = ['#ffd9e2', '#cfe0fb', '#fff0a8'], hashDone = false;
