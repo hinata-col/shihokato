@@ -133,7 +133,7 @@ h2.sec{
   margin:14px 0 12px;font-weight:700;font-size:20px;line-height:1.3;color:var(--denim);letter-spacing:.05em;
   display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
 }
-h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);letter-spacing:0}
+h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);letter-spacing:0}h2.sec{align-items:center;gap:8px}.hl{padding:0 6px;margin:0 -2px;background:linear-gradient(transparent 58%,var(--hlc,#ffd9e2) 58% 92%,transparent 92%);border-radius:2px}.hic{width:34px;height:34px;flex:0 0 auto;transform:rotate(-4deg)}
 .tag{
   display:inline-block;padding:0 9px;border-radius:999px;font-size:12px;font-weight:700;line-height:22px;
   background:var(--bg);color:var(--fg);
@@ -290,6 +290,9 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
   var $ = function (id) { return document.getElementById(id); };
   var listEl = $('catList'), navEl = $('catNav');
   var navBtns = [], secEls = [];
+  var hashDone = false;
+  var HLC = ['#ffd9e2', '#cfe0fb', '#fff0a8'];
+  var HIC = {"影視": "<rect x=\"9\" y=\"27\" width=\"46\" height=\"27\" rx=\"3\" fill=\"#fff\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M9 26L7 15l46-5 3 11z\" fill=\"#ffc9d6\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M19 24l-2-10M31 23l-2-11M43 21l-2-11\" fill=\"none\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M28 34v13l11-6.5z\" fill=\"#8db3f6\" stroke=\"#2b3a67\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>", "舞台": "<path d=\"M8 12h48v42H8z\" fill=\"#fff\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M8 12h48v8c-8 5-16 5-24 0-8 5-16 5-24 0z\" fill=\"#ff9db0\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M8 20c7 4 9 16 0 30zM56 20c-7 4-9 16 0 30z\" fill=\"#ffc9d6\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M32 34l2 4.5 5 .5-3.8 3.3 1.1 4.9L32 44.6l-4.3 2.6 1.1-4.9L25 39l5-.5z\" fill=\"#ffe27a\" stroke=\"#2b3a67\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>", "音樂": "<path d=\"M24 44V16l26-6v28\" fill=\"none\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M24 24l26-6\" fill=\"none\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"17\" cy=\"45\" rx=\"8\" ry=\"6\" fill=\"#8db3f6\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"43\" cy=\"39\" rx=\"8\" ry=\"6\" fill=\"#ffc9d6\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>", "書籍": "<path d=\"M32 18c-7-5-15-5-24-3v34c9-2 17-2 24 3 7-5 15-5 24-3V15c-9-2-17-2-24 3z\" fill=\"#fff\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M32 18v34\" fill=\"none\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M14 24c4-1 8-.6 12 1M14 32c4-1 8-.6 12 1M38 25c4-1.6 8-2 12-1M38 33c4-1.6 8-2 12-1\" fill=\"none\" stroke=\"#8db3f6\" stroke-width=\"2\" stroke-linecap=\"round\"/>", "CM": "<path d=\"M24 6l8 10 8-10\" fill=\"none\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"8\" y=\"16\" width=\"48\" height=\"34\" rx=\"7\" fill=\"#8db3f6\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"14\" y=\"22\" width=\"28\" height=\"22\" rx=\"4\" fill=\"#fff\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"49\" cy=\"27\" r=\"2.2\" fill=\"#2b3a67\"/><circle cx=\"49\" cy=\"36\" r=\"2.2\" fill=\"#2b3a67\"/><path d=\"M18 56h28\" fill=\"none\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>", "公共廣告": "<path d=\"M10 26v12l8 0 22 12V14L18 26z\" fill=\"#ffe27a\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M18 38l3 14h7l-3-11\" fill=\"#fff\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M47 24c4 4 4 12 0 16M53 18c8 8 8 20 0 28\" fill=\"none\" stroke=\"#2b3a67\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"};
 
   function parseCSV(t) {
     var rows = [], row = [], f = '', q = false;
@@ -471,11 +474,18 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       var tile = items.some(function (w) { return w.sub; });
       var note = items.some(isStar) ? '<p class="catnote"><span class="stm" aria-hidden="true">☆</span>為加藤史帆擔任 Center 的歌曲</p>' : '';
       if (items.some(function (w) { return w.pv; })) note += '<p class="catnote">30 秒試聽來自 iTunes，歌曲著作權屬於各權利人。</p>';
-      return '<section class="cat" id="cat-' + i + '"><h2 class="sec">' + esc(c) + '</h2>' + note +
+      return '<section class="cat" id="cat-' + i + '"><h2 class="sec">' + (HIC[c] ? '<svg class="hic" viewBox="0 0 64 64" aria-hidden="true">' + HIC[c] + '</svg>' : '') + '<span class="hl" style="--hlc:' + HLC[i % HLC.length] + '">' + esc(c) + '</span></h2>' + note +
         (tile ? tilesHTML(items, i) : YEAR_TABS.indexOf(c) >= 0 ? yearsHTML(items, i) : rowsHTML(items)) + '</section>';
     }).join('');
     navBtns = [].slice.call(navEl.querySelectorAll('.chip'));
     secEls = cats.map(function (c, i) { return $('cat-' + i); });
+    /* 從別頁連進來：works/#音樂 會直接捲到該分類（只處理一次） */
+    if (!hashDone && location.hash) {
+      hashDone = true;
+      var want = ''; try { want = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
+      var hi = cats.indexOf(want);
+      if (hi >= 0 && secEls[hi]) setTimeout(function () { secEls[hi].scrollIntoView({ block: 'start' }); }, 60);
+    }
     onScroll();
   }
   function setActive(i) {

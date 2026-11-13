@@ -133,7 +133,7 @@ h2.sec{
   margin:14px 0 12px;font-weight:700;font-size:20px;line-height:1.3;color:var(--denim);letter-spacing:.05em;
   display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
 }
-h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);letter-spacing:0}
+h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);letter-spacing:0}h2.sec{align-items:center;gap:8px}.hl{padding:0 6px;margin:0 -2px;background:linear-gradient(transparent 58%,var(--hlc,#ffd9e2) 58% 92%,transparent 92%);border-radius:2px}.hic{width:34px;height:34px;flex:0 0 auto;transform:rotate(-4deg)}
 .tag{
   display:inline-block;padding:0 9px;border-radius:999px;font-size:12px;font-weight:700;line-height:22px;
   background:var(--bg);color:var(--fg);
@@ -281,7 +281,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       <div class="rd">かとう しほ ／ KATO SHIHO</div>
     </div>
 
-    <h2 class="bsec">基本資料</h2>
+    <h2 class="bsec"><span class="hl" style="--hlc:#ffd9e2">基本資料</span></h2>
     <div class="card">
       <dl class="facts">
         <dt>暱稱</dt><dd>加藤史、藤史醬、史史、<a class="xl" href="https://www.bilibili.com/video/BV1nArLYHEGu/" target="_blank" rel="noopener noreferrer">最強かとし</a>、天使</dd>
@@ -292,15 +292,15 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       </dl>
     </div>
 
-    <h2 class="bsec">簡介</h2>
+    <h2 class="bsec"><span class="hl" style="--hlc:#cfe0fb">簡介</span></h2>
     <ul class="paras">
       <li>2016 年以平假名欅坂46 一期生身分出道，團體於 2019 年改名為日向坂46。活動八年後畢業，之後以個人身分發展，主要從事戲劇、模特兒與節目來賓工作。</li>
       <li>平時給人冷豔的印象，說話語氣卻軟萌、帶點呆萌，在綜藝節目中很有效果。她擅長以特殊方式辨識同團成員，是節目中的重要角色。</li>
-      <li>舞台上是專業偶像，歌聲清亮有辨識度，參與日向坂歌曲約 79 首，其中 3 首為獨唱。舞技精準、表情魅力十足，常被安排在前排，是團體門面之一。</li>
+      <li>舞台上是專業偶像，歌聲清亮有辨識度，參與日向坂歌曲<a class="xl" href="../works/#音樂">約 79 首</a>，其中 3 首為獨唱。舞技精準、表情魅力十足，常被安排在前排，是團體門面之一。</li>
       <li>個性外向，但其實十分怕生，早期缺乏自信，因此更加努力練習，也能體諒並鼓勵遇到挫折的後輩。對團體事務非常投入，曾因過度努力而住院休養；與同期成員關係親密，對後輩十分照顧。</li>
     </ul>
 
-    <h2 class="bsec">喜歡的東西與小知識</h2>
+    <h2 class="bsec"><span class="hl" style="--hlc:#fff0a8">喜歡的東西與小知識</span></h2>
     <p class="lifehint" id="doodleHint" hidden>點點看圖案</p>
     <div class="doodles" id="doodles" hidden></div>
     <ul class="likes" id="likesData">
@@ -312,7 +312,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
       <li data-icon="brush"><b>藝術</b>有藝術天分，曾在才能檢定節目中獲專家認可，最廣為人知的是獨特畫風的似顏繪。<span class="gal" hidden><a href="art/talent.jpg" data-t="art/talent-s.jpg" data-c="才能檢定節目中的作品：石頭畫、水彩畫、橡皮章">畫面</a><a href="art/tv.jpg" data-t="art/tv-s.jpg" data-c="電視節目《ひらかな推し》（テレ東）">畫面</a><a href="art/rec.jpg" data-t="art/rec-s.jpg" data-c="廣播節目《レコメン!》上畫的似顏繪">畫面</a><a href="art/badge.jpg" data-t="art/badge-s.jpg" data-c="畢業典禮週邊：她為所有成員畫的似顏繪徽章">畫面</a></span></li>
     </ul>
 
-    <h2 class="bsec">經歷</h2>
+    <h2 class="bsec"><span class="hl" style="--hlc:#ffd9e2">經歷</span></h2>
     <div class="life" id="life" hidden>
       <div class="rail" id="rail" role="tablist" aria-label="年份"></div>
       <div class="lifebody" id="lifeBody" aria-live="polite"></div>
@@ -516,6 +516,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 
   function linkify(t) {
     return esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, function (m, a, u) {
+      if (/^https?:\/\/shihokato\.pages\.dev\//i.test(u)) return '<a class="xl" href="' + u.replace(/^https?:\/\/shihokato\.pages\.dev\//i, '../') + '">' + a + '</a>';
       return '<a class="xl" href="' + u + '" target="_blank" rel="noopener noreferrer">' + a + '</a>';
     });
   }

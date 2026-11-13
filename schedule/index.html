@@ -153,7 +153,7 @@ h2.sec{
   margin:14px 0 12px;font-weight:700;font-size:20px;line-height:1.3;color:var(--denim);letter-spacing:.05em;
   display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
 }
-h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);letter-spacing:0}
+h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);letter-spacing:0}h2.sec{align-items:center;gap:8px}.hl{padding:0 6px;margin:0 -2px;background:linear-gradient(transparent 58%,var(--hlc,#ffd9e2) 58% 92%,transparent 92%);border-radius:2px}.hic{width:34px;height:34px;flex:0 0 auto;transform:rotate(-4deg)}
 
 /* 日期分組 */
 .days{display:flex;flex-direction:column;gap:10px}
@@ -169,6 +169,17 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
   font-size:12.5px;font-weight:700;
 }
 .day.is-today{border-color:var(--coral);box-shadow:0 0 0 2px var(--coral-soft)}
+/* 最近一筆：票券 */
+.days.up>.day:first-child{display:block;border:0;padding:0;border-radius:16px;background:#fffdf5;box-shadow:none;
+  -webkit-mask:radial-gradient(circle 10px at 0 66px,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 10px at 100% 66px,#0000 97%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle 10px at 0 66px,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 10px at 100% 66px,#0000 97%,#000) right/51% 100% no-repeat}
+.days.up>.day:first-child .date{flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px;height:66px;box-sizing:border-box;padding:0 20px;
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 6px,transparent 6px 12px),var(--denim);color:#fff;border-bottom:2px dashed rgba(255,255,255,.75)}
+.days.up>.day:first-child .date::before{content:"NEXT";font-size:11px;font-weight:700;letter-spacing:.22em;opacity:.75;writing-mode:vertical-rl;margin-right:2px}
+.days.up>.day:first-child .md{color:#fff;font-size:32px}
+.days.up>.day:first-child .wk{color:rgba(255,255,255,.8)}
+.days.up>.day:first-child .rel{margin-left:auto;padding:3px 12px;transform:rotate(3deg);box-shadow:0 0 0 2px #fff;white-space:nowrap}
+.days.up>.day:first-child .evs{padding:8px 16px 12px}
 .evs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;min-width:0}
 .ev{border-top:1px dashed var(--line)}
 .ev:first-child{border-top:0}
@@ -580,8 +591,8 @@ details.pm .day{background:var(--surface-2)}
     var all = filtered();
     var up = all.filter(function (e) { return (e.endIso || e.iso) >= TODAY; });
     var past = all.filter(function (e) { return (e.endIso || e.iso) < TODAY; });
-    var html = '<h2 class="sec">即將到來<small>' + up.length + ' 筆</small></h2>';
-    html += up.length ? daysHTML(up) : '<p class="empty">目前沒有即將到來的' + (state.cat === 'all' ? '' : CATNAME[state.cat]) + '行程。</p>';
+    var html = '<h2 class="sec"><svg class="hic" viewBox="0 0 64 64" aria-hidden="true"><rect x="9" y="14" width="46" height="42" rx="6" fill="#fff" stroke="#2b3a67" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 26h46V20a6 6 0 0 0-6-6H15a6 6 0 0 0-6 6z" fill="#ff9db0" stroke="#2b3a67" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 8v10M43 8v10" fill="none" stroke="#2b3a67" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 33l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5-3.7-3.4 5-.6z" fill="#ffe27a" stroke="#2b3a67" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="hl">即將到來</span><small>' + up.length + ' 筆</small></h2>';
+    html += up.length ? daysHTML(up).replace('<div class="days">', '<div class="days up">') : '<p class="empty">目前沒有即將到來的' + (state.cat === 'all' ? '' : CATNAME[state.cat]) + '行程。</p>';
 
     if (past.length) {
       /* 今年的過去行程按月份收合，更早的年份按年份收合 */
@@ -602,7 +613,7 @@ details.pm .day{background:var(--surface-2)}
         var p = mo.k.split('-');
         return { label: p[0] + '年' + (+p[1]) + '月', evs: mo.evs };
       }).concat(years.map(function (yr) { return { label: yr.k + '年', evs: yr.evs }; }));
-      html += '<h2 class="sec">過去的行程</h2><div class="past">' +
+      html += '<h2 class="sec"><svg class="hic" viewBox="0 0 64 64" aria-hidden="true"><path d="M18 8h28M18 56h28" fill="none" stroke="#2b3a67" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 8c0 14 12 16 12 24S20 42 20 56h24c0-14-12-16-12-24s12-10 12-24z" fill="#fff" stroke="#2b3a67" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M25 50c2-7 7-8 7-12 0 4 5 5 7 12z" fill="#8db3f6" stroke="#2b3a67" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="hl" style="--hlc:#cfe0fb">過去的行程</span></h2><div class="past">' +
         groups.map(function (g) {
           return '<details class="pm"><summary>' + g.label + '</summary>' +
             daysHTML(g.evs, true) + '</details>';

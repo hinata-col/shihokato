@@ -360,6 +360,19 @@ a{color:inherit}
 .fine{margin:0;font-size:12px;color:var(--ink-soft);text-align:center}
 
 
+/* 下一個行程便條（翻開後才出現，資料來自行程試算表） */
+.next{display:flex;justify-content:center;padding:18px 16px 8px}
+.next a{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;align-items:center;width:min(100%,340px);padding:16px 18px 14px;text-decoration:none;color:#232a45;
+  background:#fff6c9;border-radius:3px 3px 14px 3px;transform:rotate(-1.2deg);box-shadow:0 12px 16px -12px rgba(20,44,100,.5),0 1px 2px rgba(20,44,100,.25);transition:transform .2s}
+.next a:hover,.next a:focus-visible{transform:rotate(0deg) translateY(-2px)}
+.next a::before{content:"";position:absolute;top:-10px;left:50%;margin-left:-38px;width:76px;height:20px;transform:rotate(2deg);background:repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0 6px,rgba(255,255,255,.25) 6px 12px),rgba(246,200,215,.9)}
+.next .nh{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:11.5px;letter-spacing:.14em;color:#5a6690;font-weight:700}
+.next .nh i{font-style:normal;letter-spacing:0;font-size:12px;color:#fff;background:var(--coral);border-radius:999px;padding:1px 9px}
+.next b{font-size:26px;line-height:1;font-variant-numeric:tabular-nums;color:#27468c}
+.next .nt{font-size:14.5px;line-height:1.4;font-weight:500;overflow-wrap:anywhere}
+@media (max-width:760px){.stage{place-items:start center;flex:0 0 auto;padding-top:8px}}
+@media (prefers-reduced-motion:reduce){.next a{transition:none}}
+
 /* 浮動展開按鈕：翻開後才出現，點開像一串膠帶標籤 */
 .fab{
   position:fixed;z-index:30;
@@ -556,6 +569,8 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   <button type="button" class="pg-note" id="pagerNote">新手路線</button>
 </div>
 
+<div class="next" id="next" hidden><a href="schedule/"><span class="nh">下一個行程<i id="nextRel" hidden></i></span><b id="nextDate"></b><span class="nt" id="nextTitle"></span></a></div>
+
 <footer class="foot">
   <div class="foot-in">
     <p class="fine">個人運營的非官方粉絲站，與加藤史帆本人、所屬事務所及相關公司無關。</p>
@@ -607,6 +622,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   var note = $('#note'), toastEl = $('#toast');
   var mq = window.matchMedia('(max-width: 760px)');
   var isOpen = false, page = 1, suppress = false, toastTimer = 0;
+  var nextReady = false;
 
   function setFab(on) {
     fabMenu.dataset.open = String(on);
@@ -633,6 +649,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     fab.hidden = !isOpen;
     if (!isOpen) setFab(false);
     pager.dataset.show = String(isOpen);
+    if (nextReady) $('#next').hidden = !isOpen;
     prevBtn.disabled = page === 1;
     nextBtn.disabled = page === 2;
     dots.forEach(function (d, i) { d.dataset.on = String(i + 1 === page); });
@@ -727,7 +744,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   var FEEDS = [
     { n: '作品', seg: 'works', cache: 'shk-works-csv-v1', gid: '1969998421', cols: [/^分類/, /^作品名稱/] },
     { n: '訪談報導', seg: 'interviews', cache: 'shk-interviews-csv-v1', gid: '2065462860', cols: [/^日期/, /^標題/] },
-    { n: '行程', seg: 'schedule', gid: '0', cols: [/^日期/, /^名稱/] }
+    { n: '行程', seg: 'schedule', gid: '0', cols: [/^日期/, /^名稱/], onText: showNext }
   ];
   function csvRows(t) {
     var rows = [], row = [], cur = '', q = false, i = 0, c;
@@ -756,6 +773,31 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     });
     return out;
   }
+  function showNext(t) {
+    var rows = csvRows(t); if (!rows.length) return;
+    var head = rows[0].map(function (x) { return String(x || '').trim(); });
+    function col(re) { for (var i = 0; i < head.length; i++) if (re.test(head[i])) return i; return -1; }
+    var cd = col(/^日期/), cn = col(/^名稱/), ce = col(/^結束日期/), cs = col(/^時間.*開始/);
+    if (cd < 0 || cn < 0) return;
+    function iso(v) { var m = /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/.exec(String(v || '').trim()); return m ? m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2) : ''; }
+    function tm(v) { var m = /(\d{1,2}):(\d{2})/.exec(String(v || '')); if (!m) return '99:99'; var h = +m[1]; if (/下午|PM/i.test(v) && h < 12) h += 12; return ('0' + h).slice(-2) + ':' + m[2]; }
+    var today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date());
+    var best = null;
+    rows.slice(1).forEach(function (r) {
+      var d = iso(r[cd]), n = String(r[cn] || '').trim(); if (!d || !n) return;
+      var end = (ce >= 0 && iso(r[ce])) || d; if (end < today) return;
+      var key = (d < today ? today : d) + ' ' + (cs >= 0 ? tm(r[cs]) : '');
+      if (!best || key < best.key) best = { key: key, d: d < today ? today : d, n: n };
+    });
+    if (!best) return;
+    var p = best.d.split('-'), q = today.split('-');
+    var diff = Math.round((Date.UTC(+p[0], +p[1] - 1, +p[2]) - Date.UTC(+q[0], +q[1] - 1, +q[2])) / 86400000);
+    $('#nextDate').textContent = (+p[1]) + '/' + (+p[2]);
+    $('#nextTitle').textContent = best.n;
+    var rel = $('#nextRel'), label = diff === 0 ? '今天' : diff === 1 ? '明天' : diff <= 7 ? diff + ' 天後' : '';
+    rel.textContent = label; rel.hidden = !label;
+    nextReady = true; $('#next').hidden = !isOpen;
+  }
   FEEDS.forEach(function (f) {
     var badges = [].slice.call(document.querySelectorAll('.sticker[data-go="' + f.n + '"] .new'));
     if (!badges.length || !window.fetch) return;
@@ -765,6 +807,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     fetch(FEED_BASE + f.gid, { cache: 'no-cache' }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status); return r.text();
     }).then(function (t) {
+      if (f.onText) { try { f.onText(t); } catch (e) {} }
       current = keysOf(t, f.cols); if (!current.length) return;
       var seen = lsGet(SEEN);
       var visited = +(lsGet('shk-visit:' + f.seg) || 0), at = +(lsGet(AT) || 0);
