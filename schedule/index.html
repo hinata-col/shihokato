@@ -102,13 +102,13 @@ button{font:inherit;color:inherit}
   box-shadow:0 22px 40px -22px var(--shadow),0 2px 0 var(--line) inset;
   display:flex;flex-direction:column;gap:18px;
 }
-.sheet::before,.sheet::after{
-  content:"";position:absolute;top:-10px;width:92px;height:26px;
-  background:repeating-linear-gradient(90deg,var(--tape-2) 0 7px,transparent 7px 14px),var(--tape);
+.sheet::before{
+  content:"";position:absolute;top:-13px;left:50%;margin-left:-60px;width:120px;height:28px;transform:rotate(-1.5deg);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='28'%3E%3Cpath d='M7 3.5l1.5 3.2 3.5.4-2.6 2.4.7 3.5L7 11.3 3.9 13l.7-3.5L2 7.1l3.5-.4z' fill='%23fff' fill-opacity='.9'/%3E%3Cpath d='M20 16.5l1.2 2.6 2.8.3-2.1 1.9.6 2.8-2.5-1.4-2.5 1.4.6-2.8-2.1-1.9 2.8-.3z' fill='%23fff' fill-opacity='.7'/%3E%3C/svg%3E") 0 0/26px 28px,rgba(140,184,244,.88);
   box-shadow:0 2px 4px -1px var(--shadow);
 }
-.sheet::before{left:26px;transform:rotate(-4deg)}
-.sheet::after{right:26px;transform:rotate(3deg)}
+.sheet::after{content:none}
+
 
 .head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 h1{
