@@ -225,6 +225,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .igdlg iframe{display:block;width:100%;height:min(66vh,620px);border:0;background:#fff}
 .igdlg .df{padding:10px 16px 14px;text-align:center}
 .igdlg .df button{min-height:44px;padding:0 18px;margin-right:6px;border-radius:999px;border:1.6px solid var(--denim);background:var(--denim);color:#fff;font:700 14px/1 inherit;cursor:pointer}
+.igdlg .bigp{display:block;width:100%;max-height:66vh;object-fit:contain;background:#fff}
 .igdlg .df button.ghost{background:#fff;color:var(--denim)}
 .igdlg .df a{display:inline-block;min-height:44px;line-height:44px;padding:0 18px;border-radius:999px;border:1.6px solid var(--denim);color:var(--denim);font-weight:700;font-size:14px;text-decoration:none}
 @media (prefers-reduced-motion:reduce){.pola{transition:none}}
@@ -260,10 +261,11 @@ img[data-ph].fo{animation:phin .45s ease}
     <div class="filt" id="filt"></div>
     <div id="outList"><div class="state">讀取內容中…</div></div>
   </main>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;900&family=Playfair+Display:wght@700&display=swap">
   <dialog class="igdlg" id="igDlg" aria-label="Instagram 貼文">
     <div class="dh"><b id="igT"></b><button type="button" id="igX" aria-label="關閉">×</button></div>
     <div id="igF"></div>
-    <div class="df"><button type="button" id="igS">分享</button> <button type="button" id="igD" class="ghost" hidden>存圖</button> <a id="igA" href="#" target="_blank" rel="noopener noreferrer">在 Instagram 開啟</a></div>
+    <div class="df"><button type="button" id="igS">分享</button> <button type="button" id="igD" class="ghost" hidden>存圖</button> <button type="button" id="igL" class="ghost"></button> <a id="igA" href="#" target="_blank" rel="noopener noreferrer">在 Instagram 開啟</a></div>
   </dialog>
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
@@ -339,12 +341,12 @@ img[data-ph].fo{animation:phin .45s ease}
     var out = [];
     rows.slice(1).forEach(function (r) {
       function g(i) { return i >= 0 && r[i] != null ? String(r[i]).trim() : ''; }
-      var u = safeUrl(g(ci.u)); if (!u) return;
+      var u = safeUrl(g(ci.u)), im0 = safeUrl(g(ci.p)); if (!u && !im0) return;
       var ig = igCode(u);
       out.push({ w: g(ci.w), d: normDate(g(ci.d)) || (ig ? dateFromCode(ig.code) : null), u: u, ig: ig, ss: seasonsOf(g(ci.s)), n: g(ci.n), img: safeUrl(g(ci.p)).replace(/^http:\/\//i, 'https://') });
     });
     var seen = {};
-    out = out.filter(function (x) { var k = x.w + '|' + (x.ig ? x.ig.code : x.u); if (seen[k]) return false; seen[k] = 1; return true; });
+    out = out.filter(function (x) { var k = x.w + '|' + (x.ig ? x.ig.code : (x.u || x.img)); if (seen[k]) return false; seen[k] = 1; return true; });
     out.sort(function (a, b) { return (b.d ? b.d.n : 0) - (a.d ? a.d.n : 0); });
     return out;
   }
@@ -358,11 +360,11 @@ img[data-ph].fo{animation:phin .45s ease}
   }
   function cardHTML(it, i) {
     var pic = it.img ? '<img src="' + esc(it.img) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">' : '';
-    var inner = '<span class="pp' + (it.img ? '' : ' nopic') + '">' + (it.img ? pic : 'Instagram<br>點開看貼文') +
+    var inner = '<span class="pp' + (it.img ? '' : ' nopic') + '">' + (it.img ? pic : (it.ig ? 'Instagram<br>點開看貼文' : '點開看')) +
       (it.w ? '<span class="who' + (it.w === '久美' ? ' k' : '') + '">' + esc(it.w) + '</span>' : '') +
       (it.ss.length ? '<span class="ss">' + (it.ss.length === 4 ? '四季' : esc(it.ss.join('・'))) + '</span>' : '') + '</span>' +
       '<span class="pc"><span class="pd">' + (it.d ? it.d.key : '') + '</span>' + (it.n ? '<span class="pn">' + esc(it.n) + '</span>' : '') + '</span>';
-    if (it.ig) return '<li><button type="button" class="pola" data-i="' + i + '">' + inner + '</button></li>';
+    if (it.ig || !it.u) return '<li><button type="button" class="pola" data-i="' + i + '">' + inner + '</button></li>';
     return '<li><a class="pola" href="' + esc(it.u) + '" target="_blank" rel="noopener noreferrer">' + inner + '</a></li>';
   }
   var shown = [];
@@ -455,48 +457,82 @@ img[data-ph].fo{animation:phin .45s ease}
   var dlg = $('igDlg');
   var cur = null;
   function openIG(it) {
-    if (!it.ig) return;
-    var src = 'https://www.instagram.com/' + it.ig.kind + '/' + encodeURIComponent(it.ig.code) + '/embed/';
+    if (!it.ig && !it.img) return;
     $('igT').textContent = [it.w, it.d ? it.d.key : ''].filter(Boolean).join('　');
-    $('igF').innerHTML = '<iframe src="' + esc(src) + '" title="Instagram 貼文" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
-    $('igA').href = it.u; cur = it; $('igD').hidden = !isR2(it.img);
+    if (it.ig) {
+      var src = 'https://www.instagram.com/' + it.ig.kind + '/' + encodeURIComponent(it.ig.code) + '/embed/';
+      $('igF').innerHTML = '<iframe src="' + esc(src) + '" title="Instagram 貼文" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    } else {
+      $('igF').innerHTML = '<img class="bigp" src="' + esc(it.img) + '" alt="" referrerpolicy="no-referrer">';
+    }
+    $('igA').hidden = !it.ig; if (it.ig) $('igA').href = it.u;
+    cur = it; $('igD').hidden = !isR2(it.img);
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
   }
   function closeIG() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); $('igF').innerHTML = ''; }
-  /* 分享文案公版：{人物} {日期} {連結} 會自動代入；hashtag 在這裡改 */
-  var SHARE_TPL = '{人物}的私服穿搭 {日期}\n{連結}\n#加藤史帆 #日向坂46 #私服 #加藤史帆新手包';
-  var SITE_TXT = 'shihokato.pages.dev';
+  /* 分享文案公版：中／日各一份；IG 貼文用 #shihogram，部落格用 #shihoblog */
+  var LANG_KEY = 'shk-outfit-lang', lang = 'zh';
+  try { if (localStorage.getItem(LANG_KEY) === 'ja') lang = 'ja'; } catch (e) {}
+  var TXT = { zh: '今天的穿搭推薦', ja: '今日のコーデ' };
   function shareText(it) {
-    var url = it.ig ? 'https://www.instagram.com/' + it.ig.kind + '/' + it.ig.code + '/' : it.u;
-    return SHARE_TPL.replace('{人物}', it.w || '史史').replace('{日期}', it.d ? it.d.key : '').replace('{連結}', url).replace(/[ \t]+\n/g, '\n').trim();
+    var t = TXT[lang] + '\n#かとしふく ' + (it.ig ? '#shihogram' : '#shihoblog');
+    if (it.ig) t += '\n' + 'https://www.instagram.com/' + it.ig.kind + '/' + it.ig.code + '/';
+    return t;
   }
+  function syncLang() { $('igL').textContent = '文案：' + (lang === 'ja' ? '日' : '中'); }
   function isR2(u) { return /^https:\/\/pub-[\w-]+\.r2\.dev\//i.test(u || ''); }
+  var STAR = 'M12 1.5l3 7.2 7.8.6-5.9 5.1 1.8 7.6L12 17.9 5.3 22l1.8-7.6L1.2 9.3 9 8.7z';
+  var SPARK = 'M12 0c.8 6.5 4.5 10.2 12 12-7.5 1.8-11.2 5.5-12 12-.8-6.5-4.5-10.2-12-12C7.5 10.2 11.2 6.5 12 0z';
+  function glyph(g, path, x, y, sz, col, rot) {
+    g.save(); g.translate(x + sz / 2, y + sz / 2); g.rotate((rot || 0) * Math.PI / 180); g.scale(sz / 24, sz / 24); g.translate(-12, -12);
+    g.fillStyle = col; g.fill(new Path2D(path)); g.restore();
+  }
   function makeCard(it) {
-    return new Promise(function (ok, no) {
+    var SERIF = "'Noto Serif TC','Noto Serif CJK TC',serif", LAT = "'Playfair Display','Noto Serif TC',serif";
+    var fl = Promise.all([document.fonts.load('900 64px "Noto Serif TC"', '加藤史帆'), document.fonts.load('500 30px "Noto Serif TC"', '#かとしふく'), document.fonts.load('700 92px "Playfair Display"', 'SHIHO KATO')]).catch(function () {});
+    var ld = new Promise(function (ok, no) {
       var im = new Image(); im.crossOrigin = 'anonymous';
-      im.onerror = function () { no(new Error('img')); };
-      im.onload = function () {
-        try {
-          var W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
-          var g = c.getContext('2d');
-          g.fillStyle = '#fbf3df'; g.fillRect(0, 0, W, H);
-          g.fillStyle = 'rgba(43,58,103,.07)';
-          for (var y = 40; y < H; y += 54) for (var x = 40; x < W; x += 54) { g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); }
-          var px = 90, py = 80, pw = 900, ph = 1190;
-          g.save(); g.shadowColor = 'rgba(43,58,103,.28)'; g.shadowBlur = 36; g.shadowOffsetY = 14; g.fillStyle = '#fff'; g.fillRect(px, py, pw, ph); g.restore();
-          var bx = px + 40, by = py + 40, bw = pw - 80, bh = 930;
-          var sc = Math.max(bw / im.width, bh / im.height), sw = bw / sc, sh = bh / sc;
-          g.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, bx, by, bw, bh);
-          var F = "'Huninn','Noto Sans TC',sans-serif";
-          g.fillStyle = '#2b3a67'; g.textAlign = 'left'; g.font = '700 52px ' + F;
-          g.fillText((it.w || '史史') + '　' + (it.d ? it.d.key : ''), bx, by + bh + 90);
-          g.font = '400 34px ' + F; g.fillStyle = 'rgba(43,58,103,.7)';
-          g.fillText('加藤史帆新手包　私服穿搭', bx, by + bh + 146);
-          g.textAlign = 'right'; g.fillText(SITE_TXT, bx + bw, by + bh + 146);
-          c.toBlob(function (bl) { bl ? ok(bl) : no(new Error('blob')); }, 'image/jpeg', 0.92);
-        } catch (e) { no(e); }
-      };
-      im.src = it.img;
+      im.onerror = function () { no(new Error('img')); }; im.onload = function () { ok(im); }; im.src = it.img;
+    });
+    return Promise.all([ld, fl]).then(function (v) {
+      var im = v[0], W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+      var g = c.getContext('2d');
+      g.fillStyle = '#e8f0fd'; g.fillRect(0, 0, W, H);
+      g.strokeStyle = 'rgba(127,166,234,.35)'; g.lineWidth = 2; g.beginPath();
+      for (var x = 0; x <= W; x += 54) { g.moveTo(x, 0); g.lineTo(x, H); }
+      for (var y = 0; y <= H; y += 54) { g.moveTo(0, y); g.lineTo(W, y); }
+      g.stroke();
+      /* 斜貼的白框照片 */
+      var px = 80, py = 90, pw = 740, ph = 1040, bd = 14;
+      g.save(); g.translate(px + pw / 2, py + ph / 2); g.rotate(-1.5 * Math.PI / 180);
+      g.shadowColor = 'rgba(43,58,103,.45)'; g.shadowBlur = 40; g.shadowOffsetY = 18; g.fillStyle = '#fff'; g.fillRect(-pw / 2, -ph / 2, pw, ph);
+      g.shadowColor = 'transparent';
+      var bw = pw - bd * 2, bh = ph - bd * 2, sc = Math.max(bw / im.width, bh / im.height), sw = bw / sc, sh = bh / sc;
+      g.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, -bw / 2, -bh / 2, bw, bh);
+      g.restore();
+      /* 直排 SHIHO KATO */
+      g.fillStyle = '#2b3a67'; g.font = '700 92px ' + LAT; g.textBaseline = 'middle'; g.textAlign = 'center';
+      var s1 = 'SHIHO KATO', yy = 90;
+      for (var i = 0; i < s1.length; i++) {
+        var ch = s1[i], wd = g.measureText(ch).width;
+        g.save(); g.translate(W - 76 - 46, yy + (ch === ' ' ? 46 : wd / 2)); g.rotate(Math.PI / 2); g.fillText(ch === ' ' ? '' : ch, 0, 0); g.restore();
+        yy += (ch === ' ' ? 46 : wd) + 16;
+      }
+      /* 名字標籤 */
+      g.save(); g.translate(100, 1150); g.rotate(-2 * Math.PI / 180);
+      g.font = '900 64px ' + SERIF; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+      var tw = g.measureText('加藤史帆').width, lw = tw + 68, lh = 96;
+      g.fillStyle = '#7fa6ea'; g.fillRect(6, 6, lw, lh);
+      g.fillStyle = '#2b3a67'; g.fillRect(0, 0, lw, lh);
+      g.fillStyle = '#fff'; g.fillText('加藤史帆', 34, 72);
+      g.restore();
+      /* hashtag */
+      g.fillStyle = '#2b3a67'; g.textAlign = 'right'; g.font = '500 30px ' + SERIF; g.textBaseline = 'alphabetic';
+      g.fillText('#かとしふく', W - 76, H - 72 - 45 + 24); g.fillText(it.ig ? '#shihogram' : '#shihoblog', W - 76, H - 72 + 24);
+      /* 星星 */
+      glyph(g, STAR, 850, 640, 64, '#2b3a67', 10); glyph(g, SPARK, 900, 820, 44, '#fff'); glyph(g, STAR, 830, 980, 40, '#7fa6ea', -12);
+      glyph(g, SPARK, 80, 60, 36, '#7fa6ea'); glyph(g, STAR, 520, 1190, 34, '#7fa6ea', 6); glyph(g, SPARK, 560, 1250, 26, '#2b3a67');
+      return new Promise(function (ok, no) { c.toBlob(function (bl) { bl ? ok(bl) : no(new Error('blob')); }, 'image/jpeg', 0.92); });
     });
   }
   function cardFile(it) { return makeCard(it).then(function (bl) { return new File([bl], 'shihokato-outfit.jpg', { type: 'image/jpeg' }); }); }
@@ -525,6 +561,8 @@ img[data-ph].fo{animation:phin .45s ease}
       }).catch(plain);
     } else plain();
   });
+  $('igL').addEventListener('click', function () { lang = lang === 'ja' ? 'zh' : 'ja'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} syncLang(); });
+  syncLang();
   $('igX').addEventListener('click', closeIG);
   dlg.addEventListener('click', function (e) { if (e.target === dlg) closeIG(); });
   dlg.addEventListener('close', function () { $('igF').innerHTML = ''; });
