@@ -260,16 +260,21 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .stk li:nth-child(1) img{transform:rotate(-5deg)}.stk li:nth-child(2) img{transform:rotate(3deg)}.stk li:nth-child(3) img{transform:rotate(-2deg)}
 .stk a:hover img,.stk a:focus-visible img{transform:translateY(-3px) rotate(0) scale(1.05)}
 .stk b{font-size:13px;line-height:1.35;text-align:center;background:#fff;border-radius:999px;padding:4px 12px;box-shadow:0 2px 5px rgba(30,50,100,.18);overflow-wrap:anywhere}
-/* 片頭曲/片尾曲：貼紙膠囊 */
-.pills{list-style:none;margin:6px 0 0;padding:4px 2px;display:flex;flex-wrap:wrap;gap:10px}
-.pills a{display:inline-block;padding:8px 16px;border-radius:999px;background:var(--surface);border:1.6px solid var(--denim);color:var(--fg);font-size:14px;font-weight:700;text-decoration:none;box-shadow:2px 3px 0 rgba(43,58,103,.18);transition:transform .15s,box-shadow .15s}
-.pills li:nth-child(odd) a{transform:rotate(-1deg)}.pills li:nth-child(even) a{transform:rotate(.8deg)}
-.pills a:hover{transform:translateY(-2px) rotate(0);box-shadow:2px 5px 0 rgba(43,58,103,.2)}
+/* 片頭曲/片尾曲：圖示磁磚 */
+.pills{list-style:none;margin:6px 0 0;padding:4px 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:560px){.pills{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.pills a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:104px;padding:14px 8px 12px;border-radius:14px;text-decoration:none;text-align:center;font-weight:700;font-size:13.5px;line-height:1.4;overflow-wrap:anywhere;
+  color:var(--tc);background:var(--tb);border:1.5px solid var(--tl);transition:transform .15s,box-shadow .15s}
+.pills .e{font-size:30px;line-height:1}
+.pills a:hover,.pills a:focus-visible{transform:translateY(-2px);box-shadow:0 5px 10px -6px var(--tc)}
+.pills .op{--tb:#ffe3e9;--tl:#f3b9c7;--tc:#8a2f4c}
+.pills .ed{--tb:#e0f2e4;--tl:#b3d9bc;--tc:#2f6b45}
+.pills .ot{--tb:#e6eefc;--tl:#c5d6f3;--tc:#24427a}
 /* 業績：獎狀列 */
-.awd{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
-.awd a{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;padding:11px 14px;text-decoration:none;color:var(--fg);
+.awd{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:0}
+.awd a{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;padding:13px 2px;text-decoration:none;color:var(--fg);border-bottom:1.5px dashed rgba(43,58,103,.2)}
+.awd li:last-child a{border-bottom:0}
   background:linear-gradient(180deg,#fffbe6,#fff5c9);border:1.5px solid #ecd982;border-radius:14px;box-shadow:0 3px 0 rgba(176,140,20,.18)}
-.awd a:hover{transform:translateY(-1px)}
 .awd .medal{width:44px;height:44px}
 .awd time{display:block;font-size:12px;color:#8a6d00;font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.03em}
 .awd .at{display:block;font-size:14.5px;line-height:1.5;font-weight:700;overflow-wrap:anywhere}
@@ -378,7 +383,13 @@ img[data-ph].fo{animation:phin .45s ease}
   function A(it, cls, inner) { return '<a class="' + cls + '" href="' + esc(it.u) + '" target="_blank" rel="noopener noreferrer">' + inner + '</a>'; }
   var STK = ['stk-hibiscus.svg', 'stk-rabbit.svg', 'stk-deer.svg'];
   function tixHTML(list) { return '<ul class="stk">' + list.map(function (it, i) { return '<li>' + A(it, '', '<img src="' + STK[i % STK.length] + '" alt="" width="112" height="112" decoding="async"><b>' + esc(it.t) + '</b>') + '</li>'; }).join('') + '</ul>'; }
-  function pillsHTML(list) { return '<ul class="pills">' + list.map(function (it) { return '<li>' + A(it, '', esc(it.t)) + '</li>'; }).join('') + '</ul>'; }
+  function pillsHTML(list) {
+    return '<ul class="pills">' + list.map(function (it) {
+      var m = /^([^\sA-Za-z0-9\u3040-\u30ff\u4e00-\u9fff〈〉「」『』]+)\s+(.+)$/.exec(it.t), e = m ? m[1] : '♪', t = m ? m[2] : it.t;
+      var hasOP = /OP/.test(t), hasED = /ED/.test(t), k = hasOP && !hasED ? 'op' : hasED && !hasOP ? 'ed' : 'ot';
+      return '<li>' + A(it, k, '<span class="e" aria-hidden="true">' + esc(e) + '</span><span>' + esc(t) + '</span>') + '</li>';
+    }).join('') + '</ul>';
+  }
   function ivHTML(list) {
     return '<ul class="list">' + list.map(function (it) {
       var m = '', t = it.t, i = t.indexOf('▍');
