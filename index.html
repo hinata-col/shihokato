@@ -552,8 +552,9 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
               <span class="label">各種歡樂</span>
             </a>
 
-            <a class="sticker" href="#ayahiro" data-go="彩弘祭典" style="--x:54%;--y:50%;--w:38%;--r:-4deg;--ar:1/1">
+            <a class="sticker" href="festival/" data-go="彩弘祭典" style="--x:54%;--y:50%;--w:38%;--r:-4deg;--ar:1/1">
               <span class="shape" style="--rad:46% 54% 50% 50% / 52% 46% 54% 48%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>扶桑花</span></span><span class="gloss"></span></span>
+              <span class="new" hidden>NEW</span>
               <span class="label">彩弘祭典</span>
             </a>
           </div>
@@ -723,7 +724,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     toastEl.dataset.timer = '';
     toastTimer = setTimeout(function () { toastEl.dataset.show = 'false'; }, 2600);
   }
-  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/', '相關資源': 'resources/', '基本資料': 'basic/', '各種歡樂': 'fun/' };
+  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/', '相關資源': 'resources/', '基本資料': 'basic/', '各種歡樂': 'fun/', '彩弘祭典': 'festival/' };
   document.querySelectorAll('[data-go]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var dest = PAGES[a.dataset.go];
@@ -751,6 +752,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     { n: '作品', seg: 'works', cache: 'shk-works-csv-v1', gid: '1969998421', cols: [/^分類/, /^作品名稱/] },
     { n: '訪談報導', seg: 'interviews', cache: 'shk-interviews-csv-v1', gid: '2065462860', cols: [/^日期/, /^標題/] },
     { n: '各種歡樂', seg: 'fun', cache: 'shk-fun-csv-v1', gid: '1326270315', cols: [/^分區/, /^標題/] },
+    { n: '彩弘祭典', seg: 'festival', cache: 'shk-festival-csv-v1', gid: '332539515', cols: [/^區塊/, /^標題/] },
     { n: '行程', seg: 'schedule', gid: '0', cols: [/^日期/, /^名稱/], onText: showNext }
   ];
   function csvRows(t) {
