@@ -60,6 +60,11 @@
 
   var btn = document.getElementById('back');
   if (!btn) return;
+  var root = document.documentElement, tk = false;
+  function onScroll() { tk = false; root.classList.toggle('scrolled', (window.pageYOffset || 0) > 70); }
+  window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  onScroll();
+  try { var seg = here.replace(/\/$/, '').split('/').pop(); if (seg) localStorage.setItem('shk-visit:' + seg, String(Date.now())); } catch (e) {}
   btn.setAttribute('role', 'button'); btn.setAttribute('aria-haspopup', 'true'); btn.setAttribute('aria-expanded', 'false');
   btn.setAttribute('aria-label', '開啟頁面目錄'); btn.title = '頁面目錄';
   function set(on) {

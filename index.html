@@ -104,6 +104,7 @@ a{color:inherit}
   transition:transform 1.1s var(--ease);
 }
 .book[data-open="true"] .spread{--sx:0%}
+.book.instant,.book.instant *{transition:none!important;animation:none!important}
 @media (max-width:760px){
   .book[data-open="true"][data-page="1"] .spread{--sx:25%}
   .book[data-open="true"][data-page="2"] .spread{--sx:-25%}
@@ -456,7 +457,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
 
           <a class="sticker" href="interviews/" data-go="訪談報導" style="--x:8%;--y:9%;--w:50%;--r:-3deg;--ar:2/1">
             <span class="shape" style="--rad:30% / 46%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>柯南眼鏡</span></span><span class="gloss"></span></span>
-            <span class="new">NEW</span>
+            <span class="new" hidden>NEW</span>
             <span class="label">訪談報導</span>
           </a>
 
@@ -472,7 +473,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
 
           <a class="sticker" href="schedule/" data-go="行程" style="--x:60%;--y:61%;--w:26%;--r:-4deg;--ar:1/1">
             <span class="shape" style="--rad:14%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>日曆</span></span><span class="gloss"></span></span>
-            <span class="new">NEW</span>
+            <span class="new" hidden>NEW</span>
             <span class="label">行程</span>
           </a>
 
@@ -513,7 +514,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
 
             <a class="sticker" href="works/" data-go="作品" style="--x:54%;--y:10%;--w:36%;--r:5deg;--ar:1/1.05">
               <span class="shape" style="--rad:38% 42% 40% 40% / 36% 36% 44% 44%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>星際大戰<br>古古</span></span><span class="gloss"></span></span>
-              <span class="new">NEW</span>
+              <span class="new" hidden>NEW</span>
               <span class="label">作品</span>
             </a>
 
@@ -627,7 +628,15 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     dots.forEach(function (d, i) { d.dataset.on = String(i + 1 === page); });
   }
 
-  openBtn.addEventListener('click', function () { isOpen = true; page = 1; render(); });
+  /* 同一天回訪：直接顯示內頁，不用再翻一次封面 */
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function dayKey() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  openBtn.addEventListener('click', function () { isOpen = true; page = 1; lsSet('shk-opened-day', dayKey()); render(); });
+  if (lsGet('shk-opened-day') === dayKey()) {
+    isOpen = true; book.classList.add('instant');
+    setTimeout(function () { book.classList.remove('instant'); }, 400);
+  }
   prevBtn.addEventListener('click', function () { page = 1; render(); });
   nextBtn.addEventListener('click', function () { page = 2; render(); });
   if (mq.addEventListener) mq.addEventListener('change', render);
@@ -689,7 +698,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
       e.preventDefault();
       if (note.open) note.close();
       setFab(false);
-      showToast('雛形：正式版會前往「' + a.dataset.go + '」頁');
+      showToast('「' + a.dataset.go + '」頁還在準備中');
     });
   });
 
@@ -702,6 +711,65 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   note.addEventListener('click', function (e) { if (e.target === note) note.close(); });
 
   render();
+
+  /* NEW 標記：試算表有「你上次看過之後才新增」的項目時才亮；點進該頁就熄掉 */
+  var FEED_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwvy-Oyq413ORq1Lxo22qGb6VnLp-1Zi2UyfDgIuwAsneVJh0XHZhwm5xagSJ7QGkxFHpHrsN4LKoD/pub?single=true&output=csv&gid=';
+  var FEEDS = [
+    { n: '作品', seg: 'works', cache: 'shk-works-csv-v1', gid: '1969998421', cols: [/^分類/, /^作品名稱/] },
+    { n: '訪談報導', seg: 'interviews', cache: 'shk-interviews-csv-v1', gid: '2065462860', cols: [/^日期/, /^標題/] },
+    { n: '行程', seg: 'schedule', gid: '0', cols: [/^日期/, /^名稱/] }
+  ];
+  function csvRows(t) {
+    var rows = [], row = [], cur = '', q = false, i = 0, c;
+    t = String(t || '').replace(/^\uFEFF/, '');
+    for (; i < t.length; i++) {
+      c = t[i];
+      if (q) { if (c === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if (c !== '\r') cur += c;
+    }
+    if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+  function hash(s) { var h = 5381, i = 0; for (; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+  function keysOf(text, cols) {
+    var rows = csvRows(text); if (!rows.length) return [];
+    var head = rows[0].map(function (x) { return String(x || '').trim(); });
+    var ix = cols.map(function (re) { for (var i = 0; i < head.length; i++) if (re.test(head[i])) return i; return -1; });
+    if (ix.indexOf(-1) >= 0) return [];
+    var out = [];
+    rows.slice(1).forEach(function (r) {
+      var parts = ix.map(function (i) { return String(r[i] || '').trim(); });
+      if (parts[parts.length - 1]) out.push(hash(parts.join('|')));
+    });
+    return out;
+  }
+  FEEDS.forEach(function (f) {
+    var badges = [].slice.call(document.querySelectorAll('.sticker[data-go="' + f.n + '"] .new'));
+    if (!badges.length || !window.fetch) return;
+    var SEEN = 'shk-seen:' + f.seg, AT = 'shk-seenat:' + f.seg, current = null;
+    function markSeen() { if (current) { lsSet(SEEN, current.join(',')); lsSet(AT, String(Date.now())); } badges.forEach(function (b) { b.hidden = true; }); }
+    document.querySelectorAll('[data-go="' + f.n + '"]').forEach(function (a) { a.addEventListener('click', markSeen); });
+    fetch(FEED_BASE + f.gid, { cache: 'no-cache' }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status); return r.text();
+    }).then(function (t) {
+      current = keysOf(t, f.cols); if (!current.length) return;
+      var seen = lsGet(SEEN);
+      var visited = +(lsGet('shk-visit:' + f.seg) || 0), at = +(lsGet(AT) || 0);
+      if (seen === null) { markSeen(); return; }
+      if (visited > at) {
+        /* 從別的入口看過該頁：以該頁當時讀到的內容為準 */
+        var cached = f.cache ? lsGet(f.cache) : null, k = cached ? keysOf(cached, f.cols) : [];
+        seen = (k.length ? k : current).join(',');
+        lsSet(SEEN, seen); lsSet(AT, String(Date.now()));
+      }
+      var set = {}; seen.split(',').forEach(function (k) { set[k] = 1; });
+      var fresh = current.some(function (k) { return !set[k]; });
+      badges.forEach(function (b) { b.hidden = !fresh; });
+    }).catch(function () {});
+  });
 })();
 </script>
 
