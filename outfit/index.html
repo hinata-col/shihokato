@@ -225,6 +225,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .igdlg iframe{display:block;width:100%;height:min(66vh,620px);border:0;background:#fff}
 .igdlg .df{padding:10px 16px 14px;text-align:center}
 .igdlg .df button{min-height:44px;padding:0 18px;margin-right:6px;border-radius:999px;border:1.6px solid var(--denim);background:var(--denim);color:#fff;font:700 14px/1 inherit;cursor:pointer}
+.igdlg .df button.ghost{background:#fff;color:var(--denim)}
 .igdlg .df a{display:inline-block;min-height:44px;line-height:44px;padding:0 18px;border-radius:999px;border:1.6px solid var(--denim);color:var(--denim);font-weight:700;font-size:14px;text-decoration:none}
 @media (prefers-reduced-motion:reduce){.pola{transition:none}}
 
@@ -262,7 +263,7 @@ img[data-ph].fo{animation:phin .45s ease}
   <dialog class="igdlg" id="igDlg" aria-label="Instagram 貼文">
     <div class="dh"><b id="igT"></b><button type="button" id="igX" aria-label="關閉">×</button></div>
     <div id="igF"></div>
-    <div class="df"><button type="button" id="igS">分享</button> <a id="igA" href="#" target="_blank" rel="noopener noreferrer">在 Instagram 開啟</a></div>
+    <div class="df"><button type="button" id="igS">分享</button> <button type="button" id="igD" class="ghost" hidden>存圖</button> <a id="igA" href="#" target="_blank" rel="noopener noreferrer">在 Instagram 開啟</a></div>
   </dialog>
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
@@ -458,19 +459,71 @@ img[data-ph].fo{animation:phin .45s ease}
     var src = 'https://www.instagram.com/' + it.ig.kind + '/' + encodeURIComponent(it.ig.code) + '/embed/';
     $('igT').textContent = [it.w, it.d ? it.d.key : ''].filter(Boolean).join('　');
     $('igF').innerHTML = '<iframe src="' + esc(src) + '" title="Instagram 貼文" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
-    $('igA').href = it.u; cur = it;
+    $('igA').href = it.u; cur = it; $('igD').hidden = !isR2(it.img);
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
   }
   function closeIG() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); $('igF').innerHTML = ''; }
+  /* 分享文案公版：{人物} {日期} {連結} 會自動代入；hashtag 在這裡改 */
+  var SHARE_TPL = '{人物}的私服穿搭 {日期}\n{連結}\n#加藤史帆 #日向坂46 #私服 #加藤史帆新手包';
+  var SITE_TXT = 'shihokato.pages.dev';
+  function shareText(it) {
+    var url = it.ig ? 'https://www.instagram.com/' + it.ig.kind + '/' + it.ig.code + '/' : it.u;
+    return SHARE_TPL.replace('{人物}', it.w || '史史').replace('{日期}', it.d ? it.d.key : '').replace('{連結}', url).replace(/[ \t]+\n/g, '\n').trim();
+  }
+  function isR2(u) { return /^https:\/\/pub-[\w-]+\.r2\.dev\//i.test(u || ''); }
+  function makeCard(it) {
+    return new Promise(function (ok, no) {
+      var im = new Image(); im.crossOrigin = 'anonymous';
+      im.onerror = function () { no(new Error('img')); };
+      im.onload = function () {
+        try {
+          var W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+          var g = c.getContext('2d');
+          g.fillStyle = '#fbf3df'; g.fillRect(0, 0, W, H);
+          g.fillStyle = 'rgba(43,58,103,.07)';
+          for (var y = 40; y < H; y += 54) for (var x = 40; x < W; x += 54) { g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); }
+          var px = 90, py = 80, pw = 900, ph = 1190;
+          g.save(); g.shadowColor = 'rgba(43,58,103,.28)'; g.shadowBlur = 36; g.shadowOffsetY = 14; g.fillStyle = '#fff'; g.fillRect(px, py, pw, ph); g.restore();
+          var bx = px + 40, by = py + 40, bw = pw - 80, bh = 930;
+          var sc = Math.max(bw / im.width, bh / im.height), sw = bw / sc, sh = bh / sc;
+          g.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, bx, by, bw, bh);
+          var F = "'Huninn','Noto Sans TC',sans-serif";
+          g.fillStyle = '#2b3a67'; g.textAlign = 'left'; g.font = '700 52px ' + F;
+          g.fillText((it.w || '史史') + '　' + (it.d ? it.d.key : ''), bx, by + bh + 90);
+          g.font = '400 34px ' + F; g.fillStyle = 'rgba(43,58,103,.7)';
+          g.fillText('加藤史帆新手包　私服穿搭', bx, by + bh + 146);
+          g.textAlign = 'right'; g.fillText(SITE_TXT, bx + bw, by + bh + 146);
+          c.toBlob(function (bl) { bl ? ok(bl) : no(new Error('blob')); }, 'image/jpeg', 0.92);
+        } catch (e) { no(e); }
+      };
+      im.src = it.img;
+    });
+  }
+  function cardFile(it) { return makeCard(it).then(function (bl) { return new File([bl], 'shihokato-outfit.jpg', { type: 'image/jpeg' }); }); }
+  $('igD').addEventListener('click', function () {
+    if (!cur) return;
+    var btn = $('igD'); btn.textContent = '製作中…';
+    makeCard(cur).then(function (bl) {
+      var a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'shihokato-outfit.jpg';
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      btn.textContent = '已存圖';
+    }).catch(function () { btn.textContent = '無法製作'; }).then(function () { setTimeout(function () { btn.textContent = '存圖'; }, 1800); });
+  });
   $('igS').addEventListener('click', function () {
     if (!cur) return;
-    var url = cur.ig ? 'https://www.instagram.com/' + cur.ig.kind + '/' + cur.ig.code + '/' : cur.u;
-    var text = '加藤史帆 私服穿搭' + (cur.w ? '｜' + cur.w : '') + (cur.d ? ' ' + cur.d.key : '');
-    var btn = $('igS');
+    var it = cur, text = shareText(it), btn = $('igS');
     function done(m) { btn.textContent = m; setTimeout(function () { btn.textContent = '分享'; }, 1800); }
-    if (navigator.share) { navigator.share({ title: text, text: text, url: url }).catch(function () {}); return; }
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text + ' ' + url).then(function () { done('已複製連結'); }, function () { done('請長按複製'); });
-    else done('請長按複製');
+    function plain() {
+      if (navigator.share) { navigator.share({ text: text }).catch(function () {}); return; }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done('已複製文案'); }, function () { done('請長按複製'); });
+      else done('請長按複製');
+    }
+    if (isR2(it.img) && navigator.canShare) {
+      cardFile(it).then(function (f) {
+        if (navigator.canShare({ files: [f] })) navigator.share({ files: [f], text: text }).catch(function () {});
+        else plain();
+      }).catch(plain);
+    } else plain();
   });
   $('igX').addEventListener('click', closeIG);
   dlg.addEventListener('click', function (e) { if (e.target === dlg) closeIG(); });
