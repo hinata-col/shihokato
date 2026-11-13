@@ -239,6 +239,19 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .fsec{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 84px)}
 .fsec h2.sec{margin:26px 2px 12px}
 .mon{margin:18px 2px 8px;font-size:15px;font-weight:700;letter-spacing:.06em;color:var(--denim)}
+/* 收納區塊 */
+.acc{margin-top:14px;border-radius:16px;background:var(--surface,#fff);border:1.6px solid var(--denim);box-shadow:2px 3px 0 rgba(43,58,103,.16);overflow:hidden}
+.acc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 16px;min-height:56px;-webkit-tap-highlight-color:transparent}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary h2.sec{margin:0;flex:1;min-width:0;font-size:19px;line-height:1.5}
+.acc .cnt{font-size:12px;font-weight:700;color:var(--denim);background:#e6eefc;border-radius:999px;padding:2px 9px;font-variant-numeric:tabular-nums}
+.acc .chev{flex:0 0 auto;color:var(--denim);transition:transform .2s}
+.acc[open]>summary .chev{transform:rotate(180deg)}
+.acc[open]>summary{border-bottom:1.5px dashed rgba(43,58,103,.25)}
+.acc>summary:focus-visible{outline:3px solid #7ea3e0;outline-offset:-3px}
+.accb{padding:6px 14px 16px}
+.accb .list,.accb .awd,.accb .pills{margin-top:10px}
+.fsec.acc{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 84px)}
 /* 精選連結：貼紙 */
 .stk{list-style:none;margin:6px 0 0;padding:4px 2px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .stk a{display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;color:var(--fg)}
@@ -387,7 +400,7 @@ img[data-ph].fo{animation:phin .45s ease}
         '<span class="hx">' + (dt ? '<span class="hd">' + dt + '</span>' : '') + '<span class="ht">' + esc(it.t) + '</span></span>') + '</li>';
     }).join('') + '</ul>';
   }
-  var HLC = ['#ffd9e2', '#cfe0fb', '#fff0a8'], hashDone = false;
+  var HLC = ['#ffd9e2', '#cfe0fb', '#fff0a8'], hashDone = false, OPEN_ALWAYS = '彩弘花絮中字版', openSet = {};
   var RENDER = { 'S2片頭曲／片尾曲中字版': pillsHTML, '訪談報導': ivHTML, 'S2業績報告': awdHTML, '彩弘花絮中字版': behHTML };
   function render(items) {
     if (!items.length) { listEl.innerHTML = '<div class="state">還沒有內容，敬請期待。</div>'; navEl.hidden = true; return; }
@@ -397,7 +410,9 @@ img[data-ph].fo{animation:phin .45s ease}
     BLOCKS.slice(1).forEach(function (b) {
       if (!by[b]) return;
       var i = shown.length; shown.push(b);
-      html += '<section class="fsec" id="fs-' + i + '"><h2 class="sec"><span class="hl" style="--hlc:' + HLC[i % HLC.length] + '">' + esc(b) + '</span></h2>' + RENDER[b](by[b]) + '</section>';
+      var head = '<span class="hl" style="--hlc:' + HLC[i % HLC.length] + '">' + esc(b) + '</span>';
+      if (b === OPEN_ALWAYS) html += '<section class="fsec" id="fs-' + i + '"><h2 class="sec">' + head + '</h2>' + RENDER[b](by[b]) + '</section>';
+      else html += '<details class="fsec acc" id="fs-' + i + '" data-b="' + esc(b) + '"' + (openSet[b] ? ' open' : '') + '><summary><h2 class="sec">' + head + '</h2><span class="cnt">' + by[b].length + '</span><svg class="chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary><div class="accb">' + RENDER[b](by[b]) + '</div></details>';
     });
     listEl.innerHTML = html;
     navEl.innerHTML = shown.map(function (b, i) { return '<button type="button" class="chip" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(SHORT[b] || b) + '</button>'; }).join('');
@@ -406,7 +421,7 @@ img[data-ph].fo{animation:phin .45s ease}
       hashDone = true;
       var want = ''; try { want = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
       var hi = -1; shown.forEach(function (b, i) { if (b === want || SHORT[b] === want) hi = i; });
-      if (hi >= 0) setTimeout(function () { var el = $('fs-' + hi); if (el) el.scrollIntoView({ block: 'start' }); }, 60);
+      if (hi >= 0) setTimeout(function () { var el = $('fs-' + hi); if (el) { if (el.tagName === 'DETAILS') { el.open = true; openSet[shown[hi]] = true; } el.scrollIntoView({ block: 'start' }); } }, 60);
     }
     Array.prototype.forEach.call(listEl.querySelectorAll('.hp img'), function (img) {
       img.addEventListener('error', function () { if (img.parentNode) img.parentNode.remove(); });
@@ -415,8 +430,10 @@ img[data-ph].fo{animation:phin .45s ease}
   navEl.addEventListener('click', function (e) {
     var b = e.target.closest('.chip'); if (!b) return;
     Array.prototype.forEach.call(navEl.children, function (x) { x.setAttribute('aria-pressed', String(x === b)); });
-    var s = $('fs-' + b.dataset.i); if (s) s.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+    var s = $('fs-' + b.dataset.i);
+    if (s) { if (s.tagName === 'DETAILS') { s.open = true; openSet[s.dataset.b] = true; } s.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' }); }
   });
+  listEl.addEventListener('toggle', function (e) { var d = e.target; if (d && d.tagName === 'DETAILS' && d.dataset.b) openSet[d.dataset.b] = d.open; }, true);
   function showError() {
     listEl.innerHTML = '<div class="state">暫時讀不到內容，請稍後再試。<br><button type="button" id="retry">重新載入</button></div>';
     var r = $('retry'); if (r) r.addEventListener('click', load);
