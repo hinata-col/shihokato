@@ -306,7 +306,7 @@ img[data-ph].fo{animation:phin .45s ease}
       function g(i) { return i >= 0 && r[i] != null ? String(r[i]).trim() : ''; }
       var u = safeUrl(g(ci.u)), t = g(ci.t);
       if (!u || !t) return;
-      out.push({ c: g(ci.c) || '其他', t: t, u: u, n: g(ci.n), pf: platform(u), img: (safeUrl(g(ci.p)) || safeUrl(g(ci.a))).replace(/^http:\/\//i, 'https://') || ytThumb(u), o: n });
+      out.push({ c: g(ci.c) || '其他', t: t, u: u, n: g(ci.n), pf: platform(u), man: !!safeUrl(g(ci.p)), img: (safeUrl(g(ci.p)) || safeUrl(g(ci.a))).replace(/^http:\/\//i, 'https://') || ytThumb(u), o: n });
     });
     return out;
   }
@@ -315,7 +315,7 @@ img[data-ph].fo{animation:phin .45s ease}
       ? '<img src="' + esc(it.img) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
       : '';
     return '<li><a class="fc" href="' + esc(it.u) + '" target="_blank" rel="noopener noreferrer">' +
-      '<span class="fth' + (it.img ? '' : ' nopic') + '">' + (it.img ? pic : esc(it.pf)) + '<span class="fpf">' + esc(it.pf) + '</span><span class="fplay" aria-hidden="true"></span></span>' +
+      '<span class="fth' + (it.img ? '' : ' nopic') + '">' + (it.img ? pic : esc(it.pf)) + '<span class="fpf">' + esc(it.pf) + '</span>' + (it.man ? '' : '<span class="fplay" aria-hidden="true"></span>') + '</span>' +
       '<span class="ft">' + esc(it.t) + '</span>' + (it.n ? '<span class="fn">' + esc(it.n) + '</span>' : '') + '</a></li>';
   }
   var HLC = ['#ffd9e2', '#cfe0fb', '#fff0a8'], hashDone = false;
