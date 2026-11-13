@@ -489,8 +489,9 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
             <span class="label">訪談報導</span>
           </a>
 
-          <a class="sticker" href="#outfit" data-go="私服穿搭" style="--x:59%;--y:24%;--w:29%;--r:4deg;--ar:3/4">
+          <a class="sticker" href="outfit/" data-go="私服穿搭" style="--x:59%;--y:24%;--w:29%;--r:4deg;--ar:3/4">
             <span class="shape" style="--rad:18% 18% 10% 10% / 14% 14% 8% 8%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>葛萊芬多<br>巫師袍</span></span><span class="gloss"></span></span>
+            <span class="new" hidden>NEW</span>
             <span class="label">私服穿搭</span>
           </a>
 
@@ -593,7 +594,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     <a href="#fun" data-go="各種歡樂" style="--d:4;--r:-1deg"><span>各種歡樂</span></a>
     <a href="#ayahiro" data-go="彩弘祭典" style="--d:3;--r:2deg"><span>彩弘祭典</span></a>
     <a href="interviews/" data-go="訪談報導" style="--d:2;--r:-1.5deg"><span>訪談報導</span></a>
-    <a href="#outfit" data-go="私服穿搭" style="--d:1;--r:1deg"><span>私服穿搭</span></a>
+    <a href="outfit/" data-go="私服穿搭" style="--d:1;--r:1deg"><span>私服穿搭</span></a>
     <a href="#resources" data-go="相關資源" style="--d:0;--r:-2deg"><span>相關資源</span></a>
   </nav>
   <button type="button" class="fab-btn" id="fabBtn" aria-expanded="false" aria-controls="fabMenu" aria-label="展開頁面選單">
@@ -724,7 +725,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     toastEl.dataset.timer = '';
     toastTimer = setTimeout(function () { toastEl.dataset.show = 'false'; }, 2600);
   }
-  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/', '相關資源': 'resources/', '基本資料': 'basic/', '各種歡樂': 'fun/', '彩弘祭典': 'ayahiro2/' };
+  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/', '相關資源': 'resources/', '基本資料': 'basic/', '各種歡樂': 'fun/', '彩弘祭典': 'ayahiro2/', '私服穿搭': 'outfit/' };
   document.querySelectorAll('[data-go]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var dest = PAGES[a.dataset.go];
@@ -753,6 +754,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     { n: '訪談報導', seg: 'interviews', cache: 'shk-interviews-csv-v1', gid: '2065462860', cols: [/^日期/, /^標題/] },
     { n: '各種歡樂', seg: 'fun', cache: 'shk-fun-csv-v1', gid: '1326270315', cols: [/^分區/, /^標題/] },
     { n: '彩弘祭典', seg: 'ayahiro2', cache: 'shk-ayahiro2-csv-v1', gid: '332539515', cols: [/^區塊/, /^標題/] },
+    { n: '私服穿搭', seg: 'outfit', cache: 'shk-outfit-csv-v1', gid: '1897392637', cols: [/^人物/, /^IG|^連結/] },
     { n: '行程', seg: 'schedule', gid: '0', cols: [/^日期/, /^名稱/], onText: showNext }
   ];
   function csvRows(t) {
