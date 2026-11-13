@@ -321,6 +321,15 @@ img[data-ph].fo{animation:phin .45s ease}
     return SEASONS.filter(function (x) { return s.indexOf(x) >= 0; });
   }
   function igCode(u) { var m = /instagram\.com\/(p|reel|reels|tv)\/([\w-]+)/i.exec(u); return m ? { kind: m[1].toLowerCase() === 'p' ? 'p' : 'reel', code: m[2] } : null; }
+  function dateFromCode(c) {
+    try {
+      var A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_', n = 0n;
+      for (var i = 0; i < c.length; i++) { var k = A.indexOf(c[i]); if (k < 0) return null; n = n * 64n + BigInt(k); }
+      var ms = Number((n >> 23n) + 1314220021721n) + 8 * 3600e3;
+      var d = new Date(ms); if (!(d.getUTCFullYear() >= 2012 && d.getUTCFullYear() <= 2100)) return null;
+      return normDate(d.getUTCFullYear() + '/' + (d.getUTCMonth() + 1) + '/' + d.getUTCDate());
+    } catch (e) { return null; }
+  }
   function toItems(rows) {
     if (!rows.length) return [];
     var h = rows[0].map(function (s) { return String(s || '').trim(); });
@@ -329,7 +338,8 @@ img[data-ph].fo{animation:phin .45s ease}
     rows.slice(1).forEach(function (r) {
       function g(i) { return i >= 0 && r[i] != null ? String(r[i]).trim() : ''; }
       var u = safeUrl(g(ci.u)); if (!u) return;
-      out.push({ w: g(ci.w), d: normDate(g(ci.d)), u: u, ig: igCode(u), ss: seasonsOf(g(ci.s)), n: g(ci.n), img: safeUrl(g(ci.p)).replace(/^http:\/\//i, 'https://') });
+      var ig = igCode(u);
+      out.push({ w: g(ci.w), d: normDate(g(ci.d)) || (ig ? dateFromCode(ig.code) : null), u: u, ig: ig, ss: seasonsOf(g(ci.s)), n: g(ci.n), img: safeUrl(g(ci.p)).replace(/^http:\/\//i, 'https://') });
     });
     out.sort(function (a, b) { return (b.d ? b.d.n : 0) - (a.d ? a.d.n : 0); });
     return out;
