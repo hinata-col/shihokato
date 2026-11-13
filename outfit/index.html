@@ -224,6 +224,7 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .igdlg .dh button{flex:0 0 auto;min-width:44px;min-height:44px;border:0;border-radius:50%;background:#eef3fd;color:var(--denim);font-size:20px;line-height:1;cursor:pointer}
 .igdlg iframe{display:block;width:100%;height:min(66vh,620px);border:0;background:#fff}
 .igdlg .df{padding:10px 16px 14px;text-align:center}
+.igdlg .df button{min-height:44px;padding:0 18px;margin-right:6px;border-radius:999px;border:1.6px solid var(--denim);background:var(--denim);color:#fff;font:700 14px/1 inherit;cursor:pointer}
 .igdlg .df a{display:inline-block;min-height:44px;line-height:44px;padding:0 18px;border-radius:999px;border:1.6px solid var(--denim);color:var(--denim);font-weight:700;font-size:14px;text-decoration:none}
 @media (prefers-reduced-motion:reduce){.pola{transition:none}}
 
@@ -261,7 +262,7 @@ img[data-ph].fo{animation:phin .45s ease}
   <dialog class="igdlg" id="igDlg" aria-label="Instagram 貼文">
     <div class="dh"><b id="igT"></b><button type="button" id="igX" aria-label="關閉">×</button></div>
     <div id="igF"></div>
-    <div class="df"><a id="igA" href="#" target="_blank" rel="noopener noreferrer">在 Instagram 開啟</a></div>
+    <div class="df"><button type="button" id="igS">分享</button> <a id="igA" href="#" target="_blank" rel="noopener noreferrer">在 Instagram 開啟</a></div>
   </dialog>
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
@@ -410,17 +411,28 @@ img[data-ph].fo{animation:phin .45s ease}
       .then(function (j) { var d = j && j.daily; if (!d || d.temperature_2m_max == null) throw new Error('no data'); applyWeather(c.name, +d.temperature_2m_min[0], +d.temperature_2m_max[0]); try { localStorage.setItem(CITY_KEY, JSON.stringify(c)); } catch (e) {} })
       .catch(function () { wxMsg.textContent = '暫時查不到氣溫，可以直接點下面的季節。'; });
   }
+  var TW = [['臺北市',25.04,121.56],['新北市',25.01,121.46],['桃園市',24.99,121.30],['臺中市',24.15,120.67],['臺南市',22.99,120.21],['高雄市',22.63,120.30],['基隆市',25.13,121.74],['新竹市',24.81,120.97],['新竹縣',24.84,121.01],['苗栗縣',24.56,120.82],['彰化縣',24.07,120.54],['南投縣',23.91,120.69],['雲林縣',23.71,120.54],['嘉義市',23.48,120.45],['嘉義縣',23.46,120.33],['屏東縣',22.67,120.49],['宜蘭縣',24.75,121.75],['花蓮縣',23.99,121.60],['臺東縣',22.76,121.14],['澎湖縣',23.57,119.57],['金門縣',24.45,118.32],['連江縣',26.16,119.95]];
+  function twMatch(q) {
+    var k = q.replace(/台/g, '臺').replace(/[市縣\s]/g, '');
+    if (k.length < 2) return [];
+    return TW.filter(function (c) { return c[0].indexOf(k) >= 0; }).map(function (c) { return { name: c[0], admin1: '', country: '台灣', latitude: c[1], longitude: c[2] }; });
+  }
+  function showResults(r) {
+    wxMsg.textContent = r.length > 1 ? '請選擇：' : '';
+    wxRes.innerHTML = r.map(function (x, i) { return '<li><button type="button" data-i="' + i + '">' + esc(x.name) + '<small>' + esc([x.admin1, x.country].filter(Boolean).join('，')) + '</small></button></li>'; }).join('');
+    wxRes._r = r;
+    if (r.length === 1) { wxRes.innerHTML = ''; wxIn.value = r[0].name; loadWx({ name: r[0].name, lat: r[0].latitude, lon: r[0].longitude }); }
+  }
   function search() {
     var q = wxIn.value.trim(); wxRes.innerHTML = '';
+    var local = twMatch(q); if (local.length) { showResults(local); return; }
     if (q.length < 2) { wxMsg.textContent = '請輸入至少兩個字的城市名，例如「台北」「Tokyo」。'; return; }
     wxMsg.textContent = '搜尋中…';
-    getJSON('https://geocoding-api.open-meteo.com/v1/search?count=6&language=zh&format=json&name=' + encodeURIComponent(q))
+    getJSON('https://geocoding-api.open-meteo.com/v1/search?count=6&language=zh&format=json&name=' + encodeURIComponent(q.replace(/台/g, '臺')))
       .then(function (j) {
         var r = (j && j.results) || [];
         if (!r.length) { wxMsg.textContent = '找不到這個地方，換個寫法試試（也可以用英文）。'; return; }
-        wxMsg.textContent = '請選擇：';
-        wxRes.innerHTML = r.map(function (x, i) { return '<li><button type="button" data-i="' + i + '">' + esc(x.name) + '<small>' + esc([x.admin1, x.country].filter(Boolean).join('，')) + '</small></button></li>'; }).join('');
-        wxRes._r = r;
+        showResults(r);
       }).catch(function () { wxMsg.textContent = '搜尋失敗，請稍後再試。'; });
   }
   $('wxGo').addEventListener('click', search);
@@ -434,21 +446,32 @@ img[data-ph].fo{animation:phin .45s ease}
     if (!navigator.geolocation) { wxMsg.textContent = '這個瀏覽器不支援定位，請直接搜尋城市。'; return; }
     wxMsg.textContent = '取得位置中…';
     navigator.geolocation.getCurrentPosition(function (p) { wxRes.innerHTML = ''; loadWx({ name: '你的位置', lat: p.coords.latitude, lon: p.coords.longitude }); },
-      function () { wxMsg.textContent = '沒有取得位置，請直接搜尋城市。'; }, { timeout: 8000, maximumAge: 600000 });
+      function (e) { wxMsg.textContent = (e && e.code === 1 ? '定位被拒絕了：請在瀏覽器網址列旁允許「位置」，或' : e && e.code === 3 ? '定位逾時：' : '這個瀏覽器取不到位置（App 內建瀏覽器常見）：') + '直接輸入城市，例如「台中」。'; }, { timeout: 10000, maximumAge: 600000 });
   });
   try { var saved = JSON.parse(localStorage.getItem(CITY_KEY) || 'null'); if (saved && saved.lat != null) { wxIn.value = saved.name === '你的位置' ? '' : saved.name; loadWx(saved); } } catch (e) {}
 
   /* IG 貼文彈窗 */
   var dlg = $('igDlg');
+  var cur = null;
   function openIG(it) {
     if (!it.ig) return;
     var src = 'https://www.instagram.com/' + it.ig.kind + '/' + encodeURIComponent(it.ig.code) + '/embed/';
     $('igT').textContent = [it.w, it.d ? it.d.key : ''].filter(Boolean).join('　');
     $('igF').innerHTML = '<iframe src="' + esc(src) + '" title="Instagram 貼文" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
-    $('igA').href = it.u;
+    $('igA').href = it.u; cur = it;
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
   }
   function closeIG() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); $('igF').innerHTML = ''; }
+  $('igS').addEventListener('click', function () {
+    if (!cur) return;
+    var url = cur.ig ? 'https://www.instagram.com/' + cur.ig.kind + '/' + cur.ig.code + '/' : cur.u;
+    var text = '加藤史帆 私服穿搭' + (cur.w ? '｜' + cur.w : '') + (cur.d ? ' ' + cur.d.key : '');
+    var btn = $('igS');
+    function done(m) { btn.textContent = m; setTimeout(function () { btn.textContent = '分享'; }, 1800); }
+    if (navigator.share) { navigator.share({ title: text, text: text, url: url }).catch(function () {}); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text + ' ' + url).then(function () { done('已複製連結'); }, function () { done('請長按複製'); });
+    else done('請長按複製');
+  });
   $('igX').addEventListener('click', closeIG);
   dlg.addEventListener('click', function (e) { if (e.target === dlg) closeIG(); });
   dlg.addEventListener('close', function () { $('igF').innerHTML = ''; });
