@@ -546,8 +546,9 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
               <span class="label">作品</span>
             </a>
 
-            <a class="sticker" href="#fun" data-go="各種歡樂" style="--x:11%;--y:46%;--w:32%;--r:3deg;--ar:3/4">
+            <a class="sticker" href="fun/" data-go="各種歡樂" style="--x:11%;--y:46%;--w:32%;--r:3deg;--ar:3/4">
               <span class="shape" style="--rad:50% 50% 12% 12% / 36% 36% 8% 8%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>迪士尼城堡</span></span><span class="gloss"></span></span>
+              <span class="new" hidden>NEW</span>
               <span class="label">各種歡樂</span>
             </a>
 
@@ -603,11 +604,11 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   <span class="note-tape" aria-hidden="true"></span>
   <h2 id="noteTitle">先看這五個就懂她</h2>
   <ol>
-    <li><a href="#fun" data-go="各種歡樂"><small>現場魅力</small><span>〈ドレミソラシド〉THE FIRST TAKE</span></a></li>
+    <li><a href="fun/#史史現場魅力" data-go="各種歡樂"><small>現場魅力</small><span>〈ドレミソラシド〉THE FIRST TAKE</span></a></li>
     <li><a href="works/" data-go="作品"><small>戲劇</small><span>《彩香最愛弘子前輩》</span></a></li>
-    <li><a href="#fun" data-go="各種歡樂"><small>綜藝</small><span>名場面合輯</span></a></li>
-    <li><a href="#fun" data-go="各種歡樂"><small>運動</small><span>運動能力好得不得了的加藤史合集</span></a></li>
-    <li><a href="#fun" data-go="各種歡樂"><small>才藝</small><span>才能檢定：橡皮章、水彩、刮畫</span></a></li>
+    <li><a href="fun/#綜藝史史" data-go="各種歡樂"><small>綜藝</small><span>名場面合輯</span></a></li>
+    <li><a href="fun/#運動史史" data-go="各種歡樂"><small>運動</small><span>運動能力好得不得了的加藤史合集</span></a></li>
+    <li><a href="fun/#有才史史" data-go="各種歡樂"><small>才藝</small><span>才能檢定：橡皮章、水彩、刮畫</span></a></li>
   </ol>
   <button type="button" class="note-close" id="noteClose">關閉</button>
 </dialog>
@@ -722,11 +723,11 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
     toastEl.dataset.timer = '';
     toastTimer = setTimeout(function () { toastEl.dataset.show = 'false'; }, 2600);
   }
-  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/', '相關資源': 'resources/', '基本資料': 'basic/' };
+  var PAGES = { '行程': 'schedule/', '作品': 'works/', '訪談報導': 'interviews/', '相關資源': 'resources/', '基本資料': 'basic/', '各種歡樂': 'fun/' };
   document.querySelectorAll('[data-go]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var dest = PAGES[a.dataset.go];
-      if (dest) { a.setAttribute('href', dest); return; }
+      if (dest) { if (/^#/.test(a.getAttribute('href') || '#')) a.setAttribute('href', dest); return; }
       e.preventDefault();
       if (note.open) note.close();
       setFab(false);
@@ -749,6 +750,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   var FEEDS = [
     { n: '作品', seg: 'works', cache: 'shk-works-csv-v1', gid: '1969998421', cols: [/^分類/, /^作品名稱/] },
     { n: '訪談報導', seg: 'interviews', cache: 'shk-interviews-csv-v1', gid: '2065462860', cols: [/^日期/, /^標題/] },
+    { n: '各種歡樂', seg: 'fun', cache: 'shk-fun-csv-v1', gid: '1326270315', cols: [/^分區/, /^標題/] },
     { n: '行程', seg: 'schedule', gid: '0', cols: [/^日期/, /^名稱/], onText: showNext }
   ];
   function csvRows(t) {
