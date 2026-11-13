@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>加藤史帆新手包 訪談報導</title>
+<meta name="description" content="加藤史帆的訪談與報導中文翻譯整理。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="加藤史帆新手包">
+<meta property="og:title" content="加藤史帆新手包 訪談報導">
+<meta property="og:description" content="加藤史帆的訪談與報導中文翻譯整理。">
+<meta property="og:url" content="https://shihokato.pages.dev/interviews/">
+<meta property="og:image" content="https://shihokato.pages.dev/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
@@ -183,6 +193,24 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .ivt{font-weight:500;font-size:16px;line-height:1.55;overflow-wrap:anywhere}
 .ivs{font-size:14px;color:var(--muted);line-height:1.55;overflow-wrap:anywhere}
 .iv .go{position:absolute;right:16px;top:50%;margin-top:-9px;width:18px;height:18px;color:var(--muted)}
+/* 剪報樣式 */
+.list{gap:18px;padding:4px 2px}
+.list li{position:relative;filter:drop-shadow(0 8px 8px rgba(30,50,110,.16)) drop-shadow(0 1px 1px rgba(30,50,110,.2));transition:transform .15s}
+.list li:nth-child(odd){transform:rotate(-.7deg)}
+.list li:nth-child(even){transform:rotate(.6deg)}
+.list li:nth-child(3n){transform:rotate(-.25deg) translateX(3px)}
+.list li:hover,.list li:focus-within{transform:none}
+.list li::before{content:"";position:absolute;z-index:2;top:-9px;left:22px;width:64px;height:18px;transform:rotate(-3deg);
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 5px,rgba(255,255,255,.2) 5px 10px),rgba(246,200,215,.85)}
+.list li:nth-child(even)::before{left:auto;right:30px;transform:rotate(2.5deg);background:repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 5px,rgba(255,255,255,.2) 5px 10px),rgba(170,200,245,.85)}
+.iv{border:0;border-radius:0;background:#fffdf5;padding:18px 44px 20px 18px;
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 7px) no-repeat,radial-gradient(circle at 6px 0,#000 5.6px,#0000 6.2px) bottom left/12px 7px repeat-x;
+  mask:linear-gradient(#000 0 0) top/100% calc(100% - 7px) no-repeat,radial-gradient(circle at 6px 0,#000 5.6px,#0000 6.2px) bottom left/12px 7px repeat-x}
+.iv:hover{transform:none}
+.ivtop .tag{background:none;border:1.6px solid var(--fg);border-radius:5px;line-height:19px;letter-spacing:.04em}
+.ivt{font-weight:700;font-size:16.5px}
+.ivs{border-left:3px solid var(--line);padding-left:9px}
+@media (prefers-reduced-motion:reduce){.list li{transition:none}}
 .iv:hover .go{color:var(--denim)}
 
 </style>
