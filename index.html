@@ -304,7 +304,7 @@ a{color:inherit}
 .label{
   position:absolute;top:100%;left:50%;transform:translateX(-50%) rotate(-2deg);margin-top:calc(var(--W) * .016);
   padding:calc(var(--W) * .006) calc(var(--W) * .04);white-space:nowrap;
-  font-family:var(--font-hand);font-size:calc(var(--W) * .054);letter-spacing:.08em;color:var(--ink);
+  font-family:var(--font-hand);font-size:calc(var(--W) * .064);letter-spacing:.06em;color:var(--ink);-webkit-text-stroke:.5px currentColor;
   background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),var(--tape);
   clip-path:polygon(2% 0,98% 0,100% 18%,98% 36%,100% 54%,98% 72%,100% 100%,2% 100%,0 80%,2% 60%,0 40%,2% 20%);
   box-shadow:0 1px 2px rgba(20,44,100,.25);
@@ -317,23 +317,6 @@ a{color:inherit}
   transform:rotate(14deg);box-shadow:0 3px 5px rgba(120,20,40,.35);
 }
 
-/* 緞帶書籤 */
-.ribbon{
-  position:absolute;top:-4px;right:9%;z-index:6;
-  width:calc(var(--W) * .115);min-width:38px;height:calc(var(--W) * .42);white-space:nowrap;
-  padding:calc(var(--W) * .035) 0 calc(var(--W) * .08);border:0;cursor:pointer;
-  background:linear-gradient(90deg,#e24a5e,#f26a7b 50%,#e24a5e);
-  clip-path:polygon(0 0,100% 0,100% 100%,50% 88%,0 100%);
-  color:#fff;writing-mode:vertical-rl;text-orientation:upright;
-  font-family:var(--font-hand);font-size:calc(var(--W) * .05);letter-spacing:.1em;line-height:1;
-  filter:drop-shadow(0 4px 3px rgba(80,10,30,.4));
-}
-.ribbon:hover{background:linear-gradient(90deg,#d63c51,#ee5c6e 50%,#d63c51)}
-
-.tagline{
-  position:absolute;left:0;right:0;bottom:6%;text-align:center;
-  font-family:var(--font-script);font-size:calc(var(--W) * .072);color:var(--denim);opacity:.85;
-}
 
 /* 手機翻頁列 */
 .pager{
@@ -349,10 +332,6 @@ a{color:inherit}
 .dots{display:flex;gap:10px}
 .dots i{width:10px;height:10px;border-radius:50%;background:rgba(43,80,144,.3)}
 .dots i[data-on="true"]{background:var(--denim)}
-.pg-note{
-  min-height:44px;padding:0 16px;border-radius:999px;border:0;cursor:pointer;
-  background:var(--coral);color:#fff;font-family:var(--font-hand);font-size:18px;letter-spacing:.1em;
-}
 
 /* 底部：非官方聲明 */
 .foot{padding-block:6px calc(84px + env(safe-area-inset-bottom,0px))}
@@ -425,32 +404,6 @@ a{color:inherit}
 }
 .fab-menu a:hover span{background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),#fff}
 
-/* 新手路線卡片 */
-dialog.note{
-  width:min(360px,calc(100vw - 32px));padding:26px 22px 20px;border:0;border-radius:6px;
-  background:var(--paper);color:var(--ink);
-  background-image:radial-gradient(circle,rgba(70,114,182,.2) 1px,transparent 1.5px);background-size:18px 18px;
-  box-shadow:0 24px 50px rgba(14,32,80,.45);transform:rotate(-1.2deg);
-}
-dialog.note::backdrop{background:rgba(18,40,92,.45)}
-.note-tape{
-  position:absolute;left:50%;top:-12px;width:110px;height:26px;transform:translateX(-50%) rotate(3deg);
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),var(--tape);
-  box-shadow:0 1px 2px rgba(20,44,100,.25);
-}
-.note h2{margin:6px 0 12px;font-family:var(--font-hand);font-weight:400;font-size:28px;letter-spacing:.06em}
-.note ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
-.note li a{
-  display:flex;flex-direction:column;gap:1px;min-height:44px;padding:8px 10px;border-radius:8px;
-  text-decoration:none;
-}
-.note li a:hover{background:rgba(255,255,255,.8)}
-.note li small{font-size:12px;color:var(--ink-soft);letter-spacing:.08em}
-.note li span{font-size:15px;font-weight:500;line-height:1.5}
-.note-close{
-  margin-top:12px;min-height:44px;width:100%;border-radius:999px;border:1.5px solid var(--ink-soft);
-  background:transparent;cursor:pointer;font-size:15px;
-}
 
 .toast{
   position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);
@@ -481,15 +434,14 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
           <svg class="doodle" style="left:62%;top:5%;width:7%" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.3l7.1-.7z"/></svg>
           <svg class="doodle" style="left:84%;top:66%;width:5%" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.3l7.1-.7z"/></svg>
 
-          <button type="button" class="ribbon" id="ribbon" aria-haspopup="dialog">新手路線</button>
 
-          <a class="sticker" href="interviews/" data-go="訪談報導" style="--x:8%;--y:9%;--w:50%;--r:-3deg;--ar:2/1">
-            <span class="shape" style="--rad:30% / 46%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>柯南眼鏡</span></span><span class="gloss"></span></span>
+          <a class="sticker" href="ayahiro2/" data-go="彩弘祭典" style="--x:8%;--y:9%;--w:50%;--r:-3deg;--ar:2/1">
+            <span class="shape" style="--rad:30% / 46%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>扶桑花</span></span><span class="gloss"></span></span>
             <span class="new" hidden>NEW</span>
-            <span class="label">訪談報導</span>
+            <span class="label">彩弘祭典</span>
           </a>
 
-          <a class="sticker" href="outfit/" data-go="私服穿搭" style="--x:59%;--y:24%;--w:29%;--r:4deg;--ar:3/4">
+          <a class="sticker" href="outfit/" data-go="私服穿搭" style="--x:59%;--y:22%;--w:29%;--r:4deg;--ar:3/4">
             <span class="shape" style="--rad:18% 18% 10% 10% / 14% 14% 8% 8%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>葛萊芬多<br>巫師袍</span></span><span class="gloss"></span></span>
             <span class="new" hidden>NEW</span>
             <span class="label">私服穿搭</span>
@@ -500,13 +452,12 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
             <span class="label">相關資源</span>
           </a>
 
-          <a class="sticker" href="schedule/" data-go="行程" style="--x:60%;--y:61%;--w:26%;--r:-4deg;--ar:1/1">
-            <span class="shape" style="--rad:14%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>日曆</span></span><span class="gloss"></span></span>
+          <a class="sticker" href="schedule/" data-go="行程" style="--x:69%;--y:61%;--w:16%;--r:-4deg;--ar:418/889">
+            <span class="shape has-img"><img class="photo" src="img/sticker-schedule.webp" width="418" height="889" alt="" loading="lazy" decoding="async" data-ph style="background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAcCAYAAAC6YTVCAAAEf0lEQVR4Xn1Ua2yTVRh+zvedr1/vXTtG1210FQYr27guQRZCiCgElIliphgBjXiJBhMIJP7Q+MNo/KExIv4gxgTFaGI2LhpREgOKcolcwsZFYGZuK7Tbupa2a7/2u55jOsJCMfFNzvn1PHnO87zveYH/qdV7+/et/+ra2TnzOh5ualoj34XS+znf9E289fV5tUkZiO0RuLaGGNlaqzTxi6WO7Aawo4wX7iGJ0dlt2z7Z8+krvpnOF1rqtJ556k2PFQhzI7yYlArZtV1dXWIZP6U0IzJrHZXte1IneiAs38AWVtkeGO35jiPYyL1axrqaU450d3dbFUpaUVvgcDiRSY9x4eQh9H37GYvdOM2rL/1AljtuK+9s7vyeEDL5sDs3ALe7OkqpcNCAEInOWyhHCjGsXbIIba0tiCUSwpkrV4ZLkrFk76EzySlPhUL6ejY7vnR+e8e2aI2XLIjUoaEuhPqZzQhHmlg4FG7MJrKr7w+iXBMrppnK2MBlAirCpDKUQhEzm9vw8pateHbDxmhFEHeLGIrYWOVGINSAh1auAhFsUHJZTCgKlGJ+MQDxP30q6qYFzlBSFCRS4/A5vSiN5WCYKobiMUe7H+57+3QnEDudnlGK2H/4J+zd9wUUPQvHNDdGtSJuJUa1hnAjqVDiAHnTMDtMThCur8XNoX8wOHgDmZKJ7sNHMd1jrw5SXa9Qen7p7Lq/BoY7lq99Ghtf2gXJJuP8xWvQBTdMy0I6l2/KCO45FaTeG0N+yVPjX/XEJqxYtxGLVnbh5Pk+MFsV/P4ATyTHXbczudYKUjpjaCvWPCW6fX4QgWP95lfhdHmRSQwjUBOC3e4wVcOKV5De2LmzfWXnM06Pz8VlmcJXXY1Zza3glolQZA4RRGJW+/3Je4NwtnQ8sj1YP0OQKGOcSyjkiwAzIEo2NDTPZ4ZheXIl9cEppQ/f3x0Jz5ob5ZxzQ2con7GROFLjSRimBclmJ5phTlBKY1Okx7s2vd4YafQxy+CGYUI3DAiCgIH4KH7/4zjUXJo82vXi/t/6Y8cmp/zS9fFowOf9kzDTYxomtztkZG9nUSwquNp7FlQUMXvuQmJnpWvJy8efm/TkGLmw3ett96qSkzldTmiqAU3XJ70se/gxWKYFiBJXhy+2yC7X5/Rcz75lLsK2pC6fwEiJCMG2ZYxzAslmg8vtBrcYqF0G5wD0PEwRdYLH7vhAoMSRTKeycIcy+QlVYIzA4/VCIASEikgkkzh36lcc/fk0N4p6gBqlYjRHODRNL9jtzgPB2uBrkkSprhtIZnPoHxxG/+AQ8pkMBs/mUO+VdTp0K7HLF/B9SSWp4e9TBy+k1SffZQzvKbrOJooadMOEIFBwgUJhnBw4duGI0Lnj7f1j6ezHJVWDrplbe3svRi8N3EI8Xf50WnnyIYkUVT4fauf6lL5U6sfJyMv7bMOS1o8EQrffpDMs5qohlFI4ZAmyjYIzjmJJFZSSGhfz2cWTzS3vM7/dGyei3eRUJiK1gTELjHOIVIYoyQARGKVyyDkt2Pkv2tEHm4M3tEoAAAAASUVORK5CYII=) center/100% 100% no-repeat"></span>
             <span class="new" hidden>NEW</span>
             <span class="label">行程</span>
           </a>
 
-          <div class="tagline" style="right:auto;left:8%;text-align:left;bottom:5%" aria-hidden="true">Welcome to Shiho's World</div>
         </div>
       </section>
 
@@ -541,23 +492,23 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
               <span class="label">基本資料</span>
             </a>
 
-            <a class="sticker" href="works/" data-go="作品" style="--x:54%;--y:10%;--w:36%;--r:5deg;--ar:1/1.05">
-              <span class="shape" style="--rad:38% 42% 40% 40% / 36% 36% 44% 44%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>星際大戰<br>古古</span></span><span class="gloss"></span></span>
-              <span class="new" hidden>NEW</span>
-              <span class="label">作品</span>
-            </a>
+            <a class="sticker" href="works/" data-go="作品" style="--x:62%;--y:7%;--w:22%;--r:5deg;--ar:442/889">
+            <span class="shape has-img"><img class="photo" src="img/sticker-works.webp" width="442" height="889" alt="" loading="lazy" decoding="async" data-ph style="background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAcCAYAAABRVo5BAAAEGUlEQVR4Xn2UbWhbVRzGn3PuS25ymyZN167rmph2Mc5VxZaNum5FHYrIUCeDCeLYZFj0i/hZ8JPiR1kRUfdlDnGT4SuOic4PwmQTu9nKnBVnV1fZmrRNk+XlJrkv5y/nJi1dHbtw4Z5znt//Oc//cA9wm+fo6N6XX901tLj7wf6ZQyPbDtxOw9ZOvn/oiUdU0r8t5CvG1dxNBA09l1jfPvjax6dmV2v56sGFD0e1fzP5NxdzBWNLb1y88PCg6IuZ7flyaXitgbp64qsvJtIIGEPPHhylgB7AtT9+w/XFCVSJNqwFb3F0mGgLR2NaIp5AW0sr7hscQlUzYdWqXXd01HQjbRWWcOOfaeLFKr65OI5MbhEPxDuUOzrWHffJ+XwepXwW5y//gi+//4G1BVUrZ5VO/w+kkyeV6sRPj54be+OoVa0/resB6kptRk+8B93REMygIfb07zpYf+d4/2pYrWbcfaqV/cSZKzHHc0lXOBnr1iMcXgcNRJlC0WzTgvs94ZoA9i7D3HXttFZ2WSFTECoDxY12BK8UsD7L0WmGYdkO/fzXFIHEduu9E/EVUDNDA2W7jFxxAVbdQYsahDqbR0QNozUQRrsZRDLaScGQuYERf2sFZJq+tW47iHAT8ZYYusItsJwadFXD/RtTKFctzOeysEkQ17R99SNf+1lV4bh2KBzB8JYdGGk1UJifBVM1WOUK0pEERjruhSE01DyHWltMo1KrPgPgMichhHAc2NUaFE9BZ/QuMNsFCYEOI4Kn0sPoDLXDqdbg1W2QJ3b6jlAVk9UA6DrqN0uItIVhaw5YJAhDMeEtEMIihpZoFFaxCOG6AwvvHu9WiaGihoJoNU0+mZnGkrEguBkDlACuzlzDr5emIJZqONy7CWHTQN12Pc+reKpXsxOaqsJx3ekPxi8ExxezXQoYQoaOslWD53ngRBg7f5o9NzQwWbqUeXHHsbF5Xi4WDkxPX3n+yJkzIxcz12+onuDkurAqVTAhoDIGMIZzs3NMubuvuPPY2CQDSN34+isnZNhU7+bHFUXZ6nlCAAQigIjkFzjjmM3M4/PvfuwhIpMxVln5rVRV3S0LSLGQrxANUMgiEgfOTvze+eenH3VI3TLISdCQkCIp8WHR+G5cLsQZRGapYB7+7FRyBUyn0zEC9cnKTe5WN+lIoJrtMkM3XiIi3nB09G4hRBstkzI9CX+7TUsml2T8qZnZvhVHYm4cYJoEpam/OwIEeY0ajVYx6fL3XNZMJpO6f1kJQq8Uy1x+LHkEctxoUDMlICCIc74pwAJpHyQg3ey/372VjjQ7zOSkxIlJQcgDf8jPyIhSyyK/Of4kA2cMDATmk40VvwbDYzyVSgWISB5sI03TUwFh5J4E3t6/B9uS3XA9eTx+00gI2v4fZoQmTHu3IrwAAAAASUVORK5CYII=) center/100% 100% no-repeat"></span>
+            <span class="new" hidden>NEW</span>
+            <span class="label">作品</span>
+          </a>
 
-            <a class="sticker" href="fun/" data-go="各種歡樂" style="--x:11%;--y:46%;--w:32%;--r:3deg;--ar:3/4">
-              <span class="shape" style="--rad:50% 50% 12% 12% / 36% 36% 8% 8%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>迪士尼城堡</span></span><span class="gloss"></span></span>
-              <span class="new" hidden>NEW</span>
-              <span class="label">各種歡樂</span>
-            </a>
+            <a class="sticker" href="fun/" data-go="各種歡樂" style="--x:11%;--y:48%;--w:32%;--r:3deg;--ar:645/889">
+            <span class="shape has-img"><img class="photo" src="img/sticker-fun.webp" width="645" height="889" alt="" loading="lazy" decoding="async" data-ph style="background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAcCAYAAABh2p9gAAAFVElEQVR4Xp2VeWwUVRzHv+/NsTN7b9vtFtpdak/K2gK1tAgUg1LxwCoaTDzAgCaiidGQ+IcxJqImioaIJsYDTIwxAhYjYISCR72D1HAYagRN6W2hLfTaY3Zn3s/MahMbW6l+/3yZ93nf3znAX5IA0AcvLqDDLy+YOPs/YhOXGt86+ni4Krg+eZ59/f7bqS8THckujFr96BgdAlaMTwcnWith300etmbDsP1NBqht742ENZwKJTR/bDgJybQwnrYobWBMWBjsOWP0k6x0uYKsY6TN6ASoG2T2Y5gPfPls+/xoYAw5N+47yFiTJdvAcLG2sbzD8B/adV4su8WHvHwGk+nM6WBed5bqPeJIFlUUqkvcnDBcw9HbncCFgaQ1O6yO37yjGAW+uNVw4IG1QNMXMlrO+QsS0rr272Ow0imuOGTya4KRk9OQBSHFTFxbr8CnAOOdKZQWq8g1AKnWx3kavr5uC0NDKhK1s2/HG/hCLrT0+2qCjqId/caJgtBYqPOMP9viToM74DWTMhvXOBgjiFkcKR24MAAUl+qwQESXUqL8CmJD8xj7NqStvbU5vlVONqcrlWWJ1cMPRZuPBz98wqDkI2ubwg2ne1w5GE0WweeKwEJY98QLJYhZqsJ8rQHm8rpIyc7jmrVQE/lBThUhZ65GtI5hcZeOo5GEncvOlr0rA9mhTzUeq1OvvOGYXbGlBbgmJlRvT1+qZaCE0sjv8+CC4dq2rvXN8kWzF+4YCD1fz5QX66uDSp813iVPwGwNtZ85pWv6qNC8tQCOXVsW2R5PpR8Ne1zIcyeOkGCNzV9h8Nz+V0r8BRUrPU7r4dUNZTv2L/ru+JKa+N0VRdIq/vf++q35yYuccF6S2cIyIGc0Ft8w26Nj87130k1XVV3vd0aWEhFXvJFXJUVtkXa37LTnAa1Lv/7+9eimt58bqM60zYTa5oGuU52mJKn59TUlt8wtKfFWVlWKaE0dCsvnsUu7dpW0H3o3VTCndJEJcw3bskVMaviR+kuTgLaIwTQMo3A0LdYMxBKorrsaiqTD5ZYgJG7JkmN9mkmplFCPTzU9k0LesgWC0qkx5soqzS+pXH7spzbq6T0HJJN8T1PTYDC6GK7cyD0kqC0wMNZ3WaCdH5J1pxYs4M5AjjfL4yaVET4/8Y3Y/ckn7rnza14KzCl3EpN62YoV5mWBdsRypOpXyeXFyMgwSe5sZC1sgJxXjvF43JFIxAPclwXTX2BMtywmhcwYIxPSR+k0wef1oqe3G3GhoChajZRp0cfvv0Ojo7GUI5i3dUbAzPph/KuR4UtDXV2dPG5y7Dv6G/rgR11tDUbO97LB/t93uVTWOmNgMOjqk2T5eF60GprXh8Md/XjvZDsW33EXy8n2GIrq2TYdzNY/2sZWMnnx3IKVZVDkKEL5v6CiYgyJYZ3N3fR4R7godPY/A7nAGbfGsfi6Mjh8fhzpLsTdS1ejOl89yRibtiC2JhVlQoxnt1YVL7LaEvPYM6eWQ/LX2TAkk9Zn/+Zu2pAP7t3Tll9RMViZuywUzuEUDXL88ONZnP751391lynqVC9u3vxUAzH9oMfrk7ICAeKKA0ySGQN1m8TrH3uwsWvGVf4zEepGp8stc1mhRFqAACiyRLrTFVE4bSOiKY1MmcPbbrurVgg0WkIQ51ImBrKJYEinUiTJyh2v7TywaqYOGeOOp9PplFMIQUySwMAyDi3LQubMniew+2cEvP3OjfWapjfE4zFSNR0MHIIA07RgWlYGbBgGhKC6F15403e55cCcuneTYv9HBZEsKRlXJARM08xAhSVgp0IIMUv35pZMBfwDZS47+Kq8x8IAAAAASUVORK5CYII=) center/100% 100% no-repeat"></span>
+            <span class="new" hidden>NEW</span>
+            <span class="label">各種歡樂</span>
+          </a>
 
-            <a class="sticker" href="ayahiro2/" data-go="彩弘祭典" style="--x:54%;--y:50%;--w:38%;--r:-4deg;--ar:1/1">
-              <span class="shape" style="--rad:46% 54% 50% 50% / 52% 46% 54% 48%"><span class="die"></span><span class="art"><span><b>貼紙圖</b>扶桑花</span></span><span class="gloss"></span></span>
-              <span class="new" hidden>NEW</span>
-              <span class="label">彩弘祭典</span>
-            </a>
+            <a class="sticker" href="interviews/" data-go="訪談報導" style="--x:56%;--y:52%;--w:34%;--r:-4deg;--ar:678/889">
+            <span class="shape has-img"><img class="photo" src="img/sticker-interviews.webp" width="678" height="889" alt="" loading="lazy" decoding="async" data-ph style="background:url(data:image/png;base64,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) center/100% 100% no-repeat"></span>
+            <span class="new" hidden>NEW</span>
+            <span class="label">訪談報導</span>
+          </a>
           </div>
         </section>
       </div>
@@ -574,7 +525,6 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   <button type="button" class="pg-btn" id="nextBtn" aria-label="下一頁">
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4l6 6-6 6"/></svg>
   </button>
-  <button type="button" class="pg-note" id="pagerNote">新手路線</button>
 </div>
 
 <div class="next" id="next" hidden><a href="schedule/"><span class="nh">下一個行程<i id="nextRel" hidden></i></span><b id="nextDate"></b><span class="nt" id="nextTitle"></span></a></div>
@@ -602,18 +552,6 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   </button>
 </div>
 
-<dialog class="note" id="note" aria-labelledby="noteTitle">
-  <span class="note-tape" aria-hidden="true"></span>
-  <h2 id="noteTitle">先看這五個就懂她</h2>
-  <ol>
-    <li><a href="fun/#史史現場魅力" data-go="各種歡樂"><small>現場魅力</small><span>〈ドレミソラシド〉THE FIRST TAKE</span></a></li>
-    <li><a href="works/" data-go="作品"><small>戲劇</small><span>《彩香最愛弘子前輩》</span></a></li>
-    <li><a href="fun/#綜藝史史" data-go="各種歡樂"><small>綜藝</small><span>名場面合輯</span></a></li>
-    <li><a href="fun/#運動史史" data-go="各種歡樂"><small>運動</small><span>運動能力好得不得了的加藤史合集</span></a></li>
-    <li><a href="fun/#有才史史" data-go="各種歡樂"><small>才藝</small><span>才能檢定：橡皮章、水彩、刮畫</span></a></li>
-  </ol>
-  <button type="button" class="note-close" id="noteClose">關閉</button>
-</dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -627,7 +565,7 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
   var fab = $('#fab'), fabBtn = $('#fabBtn'), fabMenu = $('#fabMenu');
   var prevBtn = $('#prevBtn'), nextBtn = $('#nextBtn');
   var dots = document.querySelectorAll('.dots i');
-  var note = $('#note'), toastEl = $('#toast');
+  var toastEl = $('#toast');
   var mq = window.matchMedia('(max-width: 760px)');
   var isOpen = false, page = 1, suppress = false, toastTimer = 0;
   var nextReady = false;
@@ -731,19 +669,11 @@ dialog.note::backdrop{background:rgba(18,40,92,.45)}
       var dest = PAGES[a.dataset.go];
       if (dest) { if (/^#/.test(a.getAttribute('href') || '#')) a.setAttribute('href', dest); return; }
       e.preventDefault();
-      if (note.open) note.close();
       setFab(false);
       showToast('「' + a.dataset.go + '」頁還在準備中');
     });
   });
 
-  function openNote() {
-    if (typeof note.showModal === 'function') note.showModal(); else note.setAttribute('open', '');
-  }
-  $('#ribbon').addEventListener('click', openNote);
-  $('#pagerNote').addEventListener('click', openNote);
-  $('#noteClose').addEventListener('click', function () { note.close(); });
-  note.addEventListener('click', function (e) { if (e.target === note) note.close(); });
 
   render();
 
