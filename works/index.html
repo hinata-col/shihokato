@@ -176,6 +176,11 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .totop svg{width:22px;height:22px}
 .totop:hover{transform:scale(1.06)}
 @media (max-width:560px){.sheet{padding:30px 14px 22px;border-radius:18px}}
+.back .sticker-slot.bk{width:auto;height:auto;overflow:visible;border:0;border-radius:0;background:none;box-shadow:none;display:block;line-height:0}
+.back .sticker-slot.bk::after{display:none}
+.back .sticker-slot.bk img{display:block;width:104px;height:auto;transition:width .25s}
+.scrolled .back .sticker-slot.bk img{width:68px}
+@media (max-width:560px){.back .sticker-slot.bk img{width:88px}.scrolled .back .sticker-slot.bk img{width:60px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}.back .sticker-slot,.back .sticker-slot::after{animation:none!important}}
 
 
@@ -270,7 +275,7 @@ img[data-ph].fo{animation:phin .45s ease}
 <body>
 <div class="wrap">
   <div class="topbar">
-    <a class="back" href="../" id="back" aria-label="回貼紙簿" title="回貼紙簿"><span class="sticker-slot" aria-hidden="true">貼紙圖<br>貼紙簿</span></a>
+    <a class="back" href="../" id="back" aria-label="回貼紙簿" title="回貼紙簿"><span class="sticker-slot bk" aria-hidden="true"><img src="../img/sticker-book.webp" width="480" height="338" alt=""></span></a>
   </div>
   <main class="sheet">
     <div class="head">
