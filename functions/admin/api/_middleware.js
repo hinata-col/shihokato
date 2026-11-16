@@ -37,11 +37,15 @@ async function verify(token, env) {
 export async function onRequest(ctx) {
   const { request, env } = ctx;
   if (!env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD) {
+    if (request.method !== 'GET' && request.body) { try { await request.arrayBuffer(); } catch (e) {} }
     return Response.json({ ok: false, error: '後台還沒設定登入鎖（ACCESS_TEAM_DOMAIN / ACCESS_AUD）' }, { status: 503 });
   }
   const token = request.headers.get('Cf-Access-Jwt-Assertion') || '';
   let ok = false;
   try { ok = token && (await verify(token, env)); } catch (e) { ok = false; }
-  if (!ok) return Response.json({ ok: false, error: '沒有權限' }, { status: 403 });
+  if (!ok) {
+    if (request.method !== 'GET' && request.body) { try { await request.arrayBuffer(); } catch (e) {} }
+    return Response.json({ ok: false, error: '沒有權限（登入可能過期了，請重新整理頁面）' }, { status: 403 });
+  }
   return ctx.next();
 }

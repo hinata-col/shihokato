@@ -420,7 +420,7 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
     e.preventDefault();
     if (busy || !validate()) return;
     busy = true; $('confirm').disabled = true;
-    var msg = $('formMsg');
+    var msg = $('formMsg'), step = '準備';
     try {
       if (!loaded) { showMsg(msg, '讀取試算表中…', 'info'); await loadRows(); }
       var d = curDate(), blog = F.src === 'blog';
@@ -434,7 +434,7 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
       var folder = F.edit && F.edit.folder, uploaded = [];
       if (F.files.length) {
         if (folder) {
-          showMsg(msg, '清掉舊的備份圖…', 'info');
+          step = '清掉舊的備份圖'; showMsg(msg, '清掉舊的備份圖…', 'info');
           await api('upload?prefix=' + encodeURIComponent(folder), { method: 'DELETE' });
         } else {
           folder = uniqueFolder('outfit/' + (blog ? 'blog' : 'ig') + '/' + folderOf(F.who) + '/' + d.y + '/' + code);
@@ -442,6 +442,7 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
         for (var i = 0; i < F.files.length; i++) {
           showMsg(msg, '上傳中… ' + (i + 1) + ' / ' + F.files.length, 'info');
           var blob = await toJpeg(F.files[i].file), key = folder + pad(i + 1) + '.jpg';
+          step = '上傳第 ' + (i + 1) + ' 張';
           await api('upload?key=' + encodeURIComponent(key), { method: 'PUT', body: blob, headers: { 'Content-Type': 'image/jpeg' } });
           uploaded.push(key);
         }
@@ -450,13 +451,14 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
       } else if (existingImgs().length) {
         fields.thumb = R2 + folder + pad(F.thumb + 1) + '.jpg';
       }
+      step = '寫入試算表';
       showMsg(msg, '寫入試算表…', 'info');
       var res = await api('sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: F.editRow || 0, fields: fields }) });
       if (cur >= 0 && queue[cur]) queue[cur].done = true;
       showDone(fields, uploaded, res.row);
       loadRows().then(function () { renderQueue(); if (!$('viewLib').hidden) renderLib(); }).catch(function () {});
     } catch (err) {
-      showMsg(msg, '失敗：' + err.message + '（可以再按一次確認重試）');
+      showMsg(msg, step + '時失敗：' + err.message + '（可以再按一次確認重試）');
     } finally {
       busy = false; validate();
     }
