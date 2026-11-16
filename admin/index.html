@@ -674,8 +674,9 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
     history.replaceState(null, '', location.pathname + location.search);
     var msg = $('formMsg'), d;
     try { d = JSON.parse(decodeURIComponent(m[1])); } catch (e) { showMsg($('globalMsg'), 'IG 匯入資料讀不出來，請回 IG 再點一次書籤。'); return; }
-    switchTab('add'); cur = -1; resetForm('ig'); renderQueue();
     if (!loaded) { try { await loadRows(); } catch (e) {} }
+    switchTab('add'); cur = -1; resetForm('ig');
+    try { renderQueue(); } catch (e) {}
     $('link').value = 'https://www.instagram.com/p/' + d.code + '/';
     $('link').dispatchEvent(new Event('input'));
     if (!F.edit) {
@@ -703,8 +704,8 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
 
   resetForm('ig');
   loadRows().then(renderQueue).catch(function (err) { showMsg($('globalMsg'), '讀取試算表失敗：' + err.message); });
-  importFromIG();
-  window.addEventListener('hashchange', importFromIG);
+  importFromIG().catch(function (err) { showMsg($('globalMsg'), 'IG 匯入失敗：' + err.message); });
+  window.addEventListener('hashchange', function () { importFromIG().catch(function (err) { showMsg($('globalMsg'), 'IG 匯入失敗：' + err.message); }); });
 })();
 </script>
 </body>
