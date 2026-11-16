@@ -395,7 +395,6 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
   $('cancelEdit').addEventListener('click', function () { cur = -1; resetForm(F.src); renderQueue(); });
 
   function toJpeg(file) {
-    if (file.type === 'image/jpeg' && file.size <= 8 * 1024 * 1024) return Promise.resolve(file);
     return new Promise(function (res, rej) {
       var img = new Image(), u = URL.createObjectURL(file);
       img.onload = function () {
@@ -441,9 +440,11 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
         }
         for (var i = 0; i < F.files.length; i++) {
           showMsg(msg, '上傳中… ' + (i + 1) + ' / ' + F.files.length, 'info');
+          step = '讀取第 ' + (i + 1) + ' 張';
           var blob = await toJpeg(F.files[i].file), key = folder + pad(i + 1) + '.jpg';
-          step = '上傳第 ' + (i + 1) + ' 張';
-          await api('upload?key=' + encodeURIComponent(key), { method: 'PUT', body: blob, headers: { 'Content-Type': 'image/jpeg' } });
+          var bytes = await blob.arrayBuffer();
+          step = '上傳第 ' + (i + 1) + ' 張（' + Math.round(bytes.byteLength / 1024) + ' KB）';
+          await api('upload?key=' + encodeURIComponent(key), { method: 'PUT', body: bytes, headers: { 'Content-Type': 'image/jpeg' } });
           uploaded.push(key);
         }
         fields.folder = folder; fields.n = String(F.files.length);
