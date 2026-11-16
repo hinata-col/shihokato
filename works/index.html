@@ -181,6 +181,9 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .back .sticker-slot.bk img{display:block;width:104px;height:auto;transition:width .25s}
 .scrolled .back .sticker-slot.bk img{width:68px}
 @media (max-width:560px){.back .sticker-slot.bk img{width:88px}.scrolled .back .sticker-slot.bk img{width:60px}}
+.back .sticker-slot.bk{animation:bkwob 3.6s ease-in-out 1.2s infinite;transform-origin:50% 60%}
+@keyframes bkwob{0%,62%,100%{transform:rotate(-3deg) scale(1)}70%{transform:rotate(-9deg) scale(1.1) translateY(-4px)}78%{transform:rotate(4deg) scale(1.1) translateY(-4px)}86%{transform:rotate(-6deg) scale(1.05)}94%{transform:rotate(-3deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.back .sticker-slot.bk{animation:none!important}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}.back .sticker-slot,.back .sticker-slot::after{animation:none!important}}
 
 
