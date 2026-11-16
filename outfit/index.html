@@ -469,7 +469,7 @@ img[data-ph].fo{animation:phin .45s ease}
     var out = [];
     rows.slice(1).forEach(function (r) {
       function g(i) { return i >= 0 && r[i] != null ? String(r[i]).trim() : ''; }
-      if (ci.show >= 0 && !g(ci.show)) return;
+      if (ci.show >= 0 && /^(|false|0|no|n|否|不|✗|x)$/i.test(g(ci.show))) return;
       var blog = /部落格|blog/i.test(g(ci.src));
       var u = blog ? '' : safeUrl(g(ci.u)), im0 = safeUrl(g(ci.p)); if (!u && !im0) return;
       var ig = igCode(u), cnt = parseInt(g(ci.cnt), 10) || 0, dir = g(ci.dir), gal = [];
