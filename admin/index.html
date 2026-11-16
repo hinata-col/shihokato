@@ -112,6 +112,12 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
 
   <!-- 新增 -->
   <section id="viewAdd" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card" id="igImpCard">
+      <span class="lbl">從 IG 直接匯入<small>不用 saveclip、不用選檔案</small></span>
+      <span class="hint">第一次：把下面的按鈕<b>拖到 Chrome 的書籤列</b>。之後在 IG 貼文頁面（要已登入）點一下書籤，就會開新分頁回到這裡，自動放好整組圖和貼文文字，你只要確認人物、季節、縮圖再按確認。</span>
+      <a class="btn" id="igBm" href="#" style="align-self:flex-start;cursor:grab" title="拖到書籤列">⭐ IG匯入</a>
+    </div>
+
     <div class="card" id="batchCard">
       <label class="lbl" for="batch">批次模式：一次貼多個 IG 連結<small>一行一個</small></label>
       <textarea id="batch" class="in" placeholder="https://www.instagram.com/p/…&#10;https://www.instagram.com/p/…"></textarea>
@@ -651,8 +657,54 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
   $('tabAdd').addEventListener('click', function () { switchTab('add'); });
   $('tabLib').addEventListener('click', function () { openLib(false); });
 
+  /* ---------- 從 IG 匯入（書籤小工具） ---------- */
+  var BM = "(async()=>{const m=location.pathname.match(/\\/(?:p|reel|reels|tv)\\/([\\w-]+)/);if(!/instagram\\.com$/.test(location.hostname)||!m){alert('請在 IG 貼文頁面使用（網址要有 /p/ 或 /reel/）');return}"
+    + "const w=window.open('about:blank','_blank');"
+    + "try{const A='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';let n=0n;for(const c of m[1])n=n*64n+BigInt(A.indexOf(c));"
+    + "const r=await fetch('/api/v1/media/'+n+'/info/',{headers:{'X-IG-App-ID':'936619743392459'},credentials:'include'});const it=(await r.json()).items[0];const ms=it.carousel_media||[it];"
+    + "const d={code:m[1],t:it.taken_at,c:(it.caption&&it.caption.text)||'',u:it.user.username,m:ms.map(x=>({v:!!x.video_versions,i:x.image_versions2.candidates[0].url}))};"
+    + "const u='https://shihokato.pages.dev/admin/#igimport='+encodeURIComponent(JSON.stringify(d));if(w)w.location.href=u;else location.href=u}"
+    + "catch(e){if(w)w.close();alert('抓不到這篇貼文的資料：'+e.message+'（確認 IG 有登入）')}})()";
+  $('igBm').href = 'javascript:' + encodeURIComponent(BM);
+  $('igBm').addEventListener('click', function (e) { e.preventDefault(); showMsg($('globalMsg'), '這個按鈕要拖到書籤列，在 IG 貼文頁面點才有作用。', 'info'); });
+
+  async function importFromIG() {
+    var m = /^#igimport=([\s\S]+)$/.exec(location.hash);
+    if (!m) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    var msg = $('formMsg'), d;
+    try { d = JSON.parse(decodeURIComponent(m[1])); } catch (e) { showMsg($('globalMsg'), 'IG 匯入資料讀不出來，請回 IG 再點一次書籤。'); return; }
+    switchTab('add'); cur = -1; resetForm('ig'); renderQueue();
+    if (!loaded) { try { await loadRows(); } catch (e) {} }
+    $('link').value = 'https://www.instagram.com/p/' + d.code + '/';
+    $('link').dispatchEvent(new Event('input'));
+    if (!F.edit) {
+      F.who = /kumi|sasaki/i.test(d.u || '') ? '佐々木久美' : '加藤史帆';
+      var mo = new Date((d.t + 9 * 3600) * 1000).getUTCMonth() + 1;
+      F.seasons = [mo >= 3 && mo <= 5 ? '春' : mo >= 6 && mo <= 8 ? '夏' : mo >= 9 && mo <= 11 ? '秋' : '冬'];
+    }
+    if (!$('caption').value.trim()) $('caption').value = (d.c || '').trim();
+    renderForm();
+    var files = [];
+    try {
+      for (var i = 0; i < d.m.length; i++) {
+        showMsg(msg, '從 IG 抓圖中… ' + (i + 1) + ' / ' + d.m.length, 'info');
+        var r = await fetch('/admin/api/igimg?u=' + encodeURIComponent(d.m[i].i));
+        if (!r.ok) throw new Error('第 ' + (i + 1) + ' 張抓不到（' + r.status + '）');
+        files.push(new File([await r.blob()], d.code + '_' + pad(i + 1) + '.jpg', { type: 'image/jpeg' }));
+      }
+    } catch (err) { showMsg(msg, err.message + '，IG 的圖片網址可能過期了，請回 IG 頁面重新點一次書籤。'); return; }
+    addFiles(files);
+    var ti = d.m.findIndex(function (x) { return !x.v; }); F.thumb = ti < 0 ? 0 : ti;
+    renderForm();
+    var vids = d.m.filter(function (x) { return x.v; }).length;
+    showMsg(msg, '已從 IG 匯入 ' + files.length + ' 張' + (vids ? '（其中 ' + vids + ' 張是影片封面）' : '') + '，縮圖先選第一張照片。確認人物、季節、縮圖後按確認。', 'info');
+  }
+
   resetForm('ig');
   loadRows().then(renderQueue).catch(function (err) { showMsg($('globalMsg'), '讀取試算表失敗：' + err.message); });
+  importFromIG();
+  window.addEventListener('hashchange', importFromIG);
 })();
 </script>
 </body>
