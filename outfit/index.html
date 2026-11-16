@@ -224,9 +224,16 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .igdlg .dh button{flex:0 0 auto;min-width:44px;min-height:44px;border:0;border-radius:50%;background:#eef3fd;color:var(--denim);font-size:20px;line-height:1;cursor:pointer}
 .igdlg iframe{display:block;width:100%;height:min(66vh,620px);border:0;background:#fff}
 .igdlg .df{padding:10px 16px 14px;text-align:center}
-.igdlg .df button{min-height:44px;padding:0 18px;margin-right:6px;border-radius:999px;border:1.6px solid var(--denim);background:var(--denim);color:#fff;font:700 14px/1 inherit;cursor:pointer}
+.igdlg .df button{min-height:44px;padding:0 18px;margin-right:6px;border-radius:999px;border:1.6px solid var(--denim);background:var(--denim);color:#fff;font-family:inherit;font-weight:700;font-size:14px;line-height:1;cursor:pointer}
 .igdlg .bigp{display:block;width:100%;max-height:66vh;object-fit:contain;background:#fff}
-.igdlg .df button.off{opacity:.55}
+.igdlg .sp{padding:12px 16px 16px;text-align:center;max-height:calc(92vh - 64px);overflow:auto}
+.igdlg .sp img{display:block;margin:0 auto 10px;max-width:100%;max-height:48vh;border-radius:6px;box-shadow:0 8px 20px -10px rgba(20,30,70,.5)}
+.igdlg .shn{margin:8px 0 10px;font-size:14px;color:var(--denim)}
+.igdlg .sp pre{margin:0 0 12px;padding:10px 12px;text-align:left;white-space:pre-wrap;word-break:break-all;font-family:inherit;font-size:13.5px;line-height:1.6;background:#fff;border:1.5px dashed rgba(43,58,103,.3);border-radius:10px;color:var(--denim)}
+.igdlg .sbtn{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.igdlg .sp button{min-height:44px;padding:0 18px;border-radius:999px;border:1.6px solid var(--denim);background:var(--denim);color:#fff;font-family:inherit;font-weight:700;font-size:14px;line-height:1;cursor:pointer}
+.igdlg .sp button.ghost{background:#fff;color:var(--denim)}
+.igdlg .sp button.lnk{display:block;margin:12px auto 0;border:0;background:none;color:var(--denim);font-weight:500;text-decoration:underline;min-height:44px}
 .igdlg .df button.ghost{background:#fff;color:var(--denim)}
 .igdlg .df a{display:inline-block;min-height:44px;line-height:44px;padding:0 18px;border-radius:999px;border:1.6px solid var(--denim);color:var(--denim);font-weight:700;font-size:14px;text-decoration:none}
 @media (prefers-reduced-motion:reduce){.pola{transition:none}}
@@ -266,7 +273,14 @@ img[data-ph].fo{animation:phin .45s ease}
   <dialog class="igdlg" id="igDlg" aria-label="Instagram 貼文">
     <div class="dh"><b id="igT"></b><button type="button" id="igX" aria-label="關閉">×</button></div>
     <div id="igF"></div>
-    <div class="df"><button type="button" id="igS">分享</button> <button type="button" id="igD" class="ghost">存圖</button> <a id="igA" href="#" target="_blank" rel="noopener noreferrer">在 Instagram 開啟</a></div>
+    <div class="df" id="igMain"><button type="button" id="igS">分享今日穿搭</button> <a id="igA" href="#" target="_blank" rel="noopener noreferrer">在 Instagram 開啟</a></div>
+    <div class="sp" id="shP" hidden>
+      <img id="shImg" alt="圖卡預覽" hidden>
+      <p id="shNote" class="shn"></p>
+      <pre id="shTxt"></pre>
+      <div class="sbtn"><button type="button" id="shDl">下載圖卡</button> <button type="button" id="shGo">分享</button> <button type="button" id="shCp" class="ghost">複製文案</button></div>
+      <button type="button" id="shBack" class="lnk">← 回到貼文</button>
+    </div>
   </dialog>
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
@@ -472,10 +486,10 @@ img[data-ph].fo{animation:phin .45s ease}
       $('igF').innerHTML = '<img class="bigp" src="' + esc(it.img) + '" alt="" referrerpolicy="no-referrer">';
     }
     $('igA').hidden = !it.ig; if (it.ig) $('igA').href = it.u;
-    cur = it; $('igD').textContent = '存圖'; $('igD').classList.toggle('off', !isR2(it.img));
+    cur = it; $('igS').hidden = !isR2(it.img); showMain();
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
   }
-  function closeIG() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); $('igF').innerHTML = ''; }
+  function closeIG() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); $('igF').innerHTML = ''; showMain(); }
   /* 分享文案：跟著全站語言（localStorage 'shk-lang' 或 <html lang>），預設中文；各人物 hashtag 在 PEOPLE 裡 */
   var TXT = { zh: '今天的穿搭推薦', ja: '今日のコーデ' };
   function siteLang() {
@@ -545,32 +559,47 @@ img[data-ph].fo{animation:phin .45s ease}
     });
   }
   function cardFile(it) { return makeCard(it).then(function (bl) { return new File([bl], 'shihokato-outfit.jpg', { type: 'image/jpeg' }); }); }
-  $('igD').addEventListener('click', function () {
+  /* 分享預覽：先看圖卡與文案，再下載或分享 */
+  var shBlob = null, shFile = null, shUrl = '', shSeq = 0;
+  function flash(btn, msg, back) { btn.textContent = msg; setTimeout(function () { btn.textContent = back; }, 1800); }
+  function showMain() {
+    $('shP').hidden = true; $('igF').hidden = false; $('igMain').hidden = false;
+    if (shUrl) { URL.revokeObjectURL(shUrl); shUrl = ''; } shBlob = shFile = null; shSeq++;
+  }
+  function showPreview() {
     if (!cur) return;
-    var btn = $('igD');
-    if (!isR2(cur.img)) { btn.textContent = '需先填縮圖'; setTimeout(function () { btn.textContent = '存圖'; }, 2200); return; }
-    btn.textContent = '製作中…';
-    makeCard(cur).then(function (bl) {
-      var a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'shihokato-outfit.jpg';
-      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
-      btn.textContent = '已存圖';
-    }).catch(function () { btn.textContent = '無法製作'; }).then(function () { setTimeout(function () { btn.textContent = '存圖'; }, 1800); });
+    var it = cur, my = ++shSeq;
+    $('igF').hidden = true; $('igMain').hidden = true; $('shP').hidden = false;
+    $('shTxt').textContent = shareText(it);
+    var hasCard = isR2(it.img);
+    $('shDl').hidden = !hasCard; $('shImg').hidden = true; $('shNote').hidden = false;
+    $('shNote').textContent = hasCard ? '圖卡製作中…' : '這則還沒有 R2 縮圖，沒辦法製作圖卡，只能分享文案。';
+    if (!hasCard) return;
+    makeCard(it).then(function (bl) {
+      if (my !== shSeq) return;
+      shBlob = bl; shFile = new File([bl], 'shihokato-outfit.jpg', { type: 'image/jpeg' });
+      shUrl = URL.createObjectURL(bl); $('shImg').src = shUrl; $('shImg').hidden = false; $('shNote').hidden = true;
+    }).catch(function () { if (my === shSeq) { $('shNote').textContent = '圖卡做不出來（可能是 R2 的 CORS 還沒設好），仍然可以分享文案。'; $('shDl').hidden = true; } });
+  }
+  $('igS').addEventListener('click', showPreview);
+  $('shBack').addEventListener('click', showMain);
+  $('shDl').addEventListener('click', function () {
+    if (!shBlob) return;
+    var a = document.createElement('a'), u = URL.createObjectURL(shBlob); a.href = u; a.download = 'shihokato-outfit.jpg';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+    flash($('shDl'), '已下載', '下載圖卡');
   });
-  $('igS').addEventListener('click', function () {
-    if (!cur) return;
-    var it = cur, text = shareText(it), btn = $('igS');
-    function done(m) { btn.textContent = m; setTimeout(function () { btn.textContent = '分享'; }, 1800); }
-    function plain() {
-      if (navigator.share) { navigator.share({ text: text }).catch(function () {}); return; }
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done('已複製文案'); }, function () { done('請長按複製'); });
-      else done('請長按複製');
-    }
-    if (isR2(it.img) && navigator.canShare) {
-      cardFile(it).then(function (f) {
-        if (navigator.canShare({ files: [f] })) navigator.share({ files: [f], text: text }).catch(function () {});
-        else plain();
-      }).catch(plain);
-    } else plain();
+  function copyText(btn, back) {
+    var t = $('shTxt').textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { flash(btn, '已複製', back); }, function () { flash(btn, '請長按文字複製', back); });
+    else flash(btn, '請長按文字複製', back);
+  }
+  $('shCp').addEventListener('click', function () { copyText($('shCp'), '複製文案'); });
+  $('shGo').addEventListener('click', function () {
+    var text = $('shTxt').textContent, btn = $('shGo');
+    if (shFile && navigator.canShare && navigator.canShare({ files: [shFile] })) { navigator.share({ files: [shFile], text: text }).catch(function () {}); return; }
+    if (navigator.share) { navigator.share({ text: text }).catch(function () {}); return; }
+    copyText(btn, '分享');
   });
   $('igX').addEventListener('click', closeIG);
   dlg.addEventListener('click', function (e) { if (e.target === dlg) closeIG(); });
