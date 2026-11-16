@@ -225,6 +225,15 @@ h2.sec small{font-family:var(--font-body);font-size:14px;color:var(--muted);lett
 .igdlg iframe{display:block;width:100%;height:min(66vh,620px);border:0;background:#fff}
 .igdlg .df{padding:10px 16px 14px;text-align:center}
 .igdlg .df button{min-height:44px;padding:0 18px;margin-right:6px;border-radius:999px;border:1.6px solid var(--denim);background:var(--denim);color:#fff;font-family:inherit;font-weight:700;font-size:14px;line-height:1;cursor:pointer}
+.gal{background:#fff}.gbig{position:relative;background:#fff}
+.gbig img{display:block;width:100%;height:min(60vh,560px);object-fit:contain}
+.gnav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--denim);display:grid;place-items:center;box-shadow:0 2px 6px rgba(20,40,90,.2);cursor:pointer}
+.gnav svg{width:20px;height:20px}.gp{left:8px}.gn{right:8px}
+.gct{position:absolute;right:10px;bottom:10px;padding:2px 10px;border-radius:999px;background:rgba(27,42,76,.75);color:#fff;font-size:12.5px}
+.gthumbs{display:flex;gap:6px;padding:10px 12px 2px;overflow-x:auto}
+.gthumbs button{flex:0 0 56px;height:70px;padding:0;border:1.5px solid #d5e0f2;border-radius:6px;overflow:hidden;background:#dfe7f6;cursor:pointer}
+.gthumbs button[aria-current="true"]{border:3px solid var(--denim)}
+.gthumbs img{display:block;width:100%;height:100%;object-fit:cover}
 .igdlg .bigp{display:block;width:100%;max-height:66vh;object-fit:contain;background:#fff}
 .igdlg .sp{padding:12px 16px 16px;text-align:center;max-height:calc(92vh - 64px);overflow:auto}
 .igdlg .sp img{display:block;margin:0 auto 10px;max-width:100%;max-height:48vh;border-radius:6px;box-shadow:0 8px 20px -10px rgba(20,30,70,.5)}
@@ -357,13 +366,17 @@ img[data-ph].fo{animation:phin .45s ease}
   function toItems(rows) {
     if (!rows.length) return [];
     var h = rows[0].map(function (s) { return String(s || '').trim(); });
-    var ci = { w: idx(h, /^人物/), d: idx(h, /^日期/), u: idx(h, /^IG|^連結/), s: idx(h, /^季節/), n: idx(h, /^備註/), p: idx(h, /^縮圖/) };
+    var ci = { w: idx(h, /^人物/), d: idx(h, /^日期/), u: idx(h, /^IG|^連結/), s: idx(h, /^季節/), n: idx(h, /^備註/), p: idx(h, /^縮圖/),
+      src: idx(h, /^來源/), cnt: idx(h, /^張數/), dir: idx(h, /^備份資料夾/), show: idx(h, /^顯示/) };
     var out = [];
     rows.slice(1).forEach(function (r) {
       function g(i) { return i >= 0 && r[i] != null ? String(r[i]).trim() : ''; }
-      var u = safeUrl(g(ci.u)), im0 = safeUrl(g(ci.p)); if (!u && !im0) return;
-      var ig = igCode(u);
-      out.push({ w: normW(g(ci.w)), d: normDate(g(ci.d)) || (ig ? dateFromCode(ig.code) : null), u: u, ig: ig, ss: seasonsOf(g(ci.s)), n: g(ci.n), img: safeUrl(g(ci.p)).replace(/^http:\/\//i, 'https://') });
+      if (ci.show >= 0 && !g(ci.show)) return;
+      var blog = /部落格|blog/i.test(g(ci.src));
+      var u = blog ? '' : safeUrl(g(ci.u)), im0 = safeUrl(g(ci.p)); if (!u && !im0) return;
+      var ig = igCode(u), cnt = parseInt(g(ci.cnt), 10) || 0, dir = g(ci.dir), gal = [];
+      if (isR2(im0) && cnt > 0 && /^[\w\/-]+\/$/.test(dir)) { var base = im0.replace(/^(https:\/\/[^\/]+\/).*$/, '$1'); for (var k = 1; k <= cnt; k++) gal.push(base + dir + ('0' + k).slice(-2) + '.jpg'); }
+      out.push({ w: normW(g(ci.w)), d: normDate(g(ci.d)) || (ig ? dateFromCode(ig.code) : null), u: u, ig: ig, blog: blog, gal: gal, ss: seasonsOf(g(ci.s)), n: g(ci.n), img: im0.replace(/^http:\/\//i, 'https://') });
     });
     var seen = {};
     out = out.filter(function (x) { var k = x.w + '|' + (x.ig ? x.ig.code : (x.u || x.img)); if (seen[k]) return false; seen[k] = 1; return true; });
@@ -380,7 +393,7 @@ img[data-ph].fo{animation:phin .45s ease}
   }
   function cardHTML(it, i) {
     var pic = it.img ? '<img src="' + esc(it.img) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">' : '';
-    var inner = '<span class="pp' + (it.img ? '' : ' nopic') + '">' + (it.img ? pic : (it.ig ? 'Instagram<br>點開看貼文' : '點開看')) +
+    var inner = '<span class="pp' + (it.img ? '' : ' nopic') + '">' + (it.img ? pic : (it.ig ? 'Instagram<br>點開看貼文' : it.blog ? '部落格' : '點開看')) +
       (it.w ? '<span class="who' + (it.w === '佐々木久美' ? ' k' : '') + '">' + esc(it.w) + '</span>' : '') +
       (it.ss.length ? '<span class="ss">' + (it.ss.length === 4 ? '四季' : esc(it.ss.join('・'))) + '</span>' : '') + '</span>' +
       '<span class="pc"><span class="pd">' + (it.d ? it.d.key : '') + '</span>' + (it.n ? '<span class="pn">' + esc(it.n) + '</span>' : '') + '</span>';
@@ -482,8 +495,26 @@ img[data-ph].fo{animation:phin .45s ease}
     if (it.ig) {
       var src = 'https://www.instagram.com/' + it.ig.kind + '/' + encodeURIComponent(it.ig.code) + '/embed/';
       $('igF').innerHTML = '<iframe src="' + esc(src) + '" title="Instagram 貼文" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    } else if (it.gal && it.gal.length > 1) {
+      $('igF').innerHTML = '<div class="gal"><div class="gbig"><img id="gImg" alt="" referrerpolicy="no-referrer">' +
+        '<button type="button" class="gnav gp" id="gPrev" aria-label="上一張"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg></button>' +
+        '<button type="button" class="gnav gn" id="gNext" aria-label="下一張"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg></button>' +
+        '<span class="gct" id="gCt"></span></div><div class="gthumbs" id="gTh">' +
+        it.gal.map(function (u, i) { return '<button type="button" data-g="' + i + '" aria-label="第 ' + (i + 1) + ' 張"><img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></button>'; }).join('') + '</div></div>';
+      var gi = Math.max(0, it.gal.indexOf(it.img));
+      var setG = function (i) {
+        gi = (i + it.gal.length) % it.gal.length; $('gImg').src = it.gal[gi]; $('gCt').textContent = (gi + 1) + ' / ' + it.gal.length;
+        Array.prototype.forEach.call($('gTh').children, function (b, k) { b.setAttribute('aria-current', String(k === gi)); });
+      };
+      $('gPrev').addEventListener('click', function () { setG(gi - 1); });
+      $('gNext').addEventListener('click', function () { setG(gi + 1); });
+      $('gTh').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) setG(+b.dataset.g); });
+      var sx = null, big = $('gImg').parentNode;
+      big.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+      big.addEventListener('touchend', function (e) { if (sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 40) setG(gi + (dx < 0 ? 1 : -1)); });
+      setG(gi);
     } else {
-      $('igF').innerHTML = '<img class="bigp" src="' + esc(it.img) + '" alt="" referrerpolicy="no-referrer">';
+      $('igF').innerHTML = '<img class="bigp" src="' + esc(it.gal && it.gal[0] || it.img) + '" alt="" referrerpolicy="no-referrer">';
     }
     $('igA').hidden = !it.ig; if (it.ig) $('igA').href = it.u;
     cur = it; $('igS').hidden = !isR2(it.img); showMain();

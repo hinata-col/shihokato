@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>私服穿搭後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;700&display=swap">
+<style>
+:root{color-scheme:light;--ink:#1b2a4c;--muted:#566890;--denim:#2b5090;--line:#d5e0f2;--line2:#c9d6ee;--paper:#f7faff;--soft:#eef3fd;--bad:#b0364b;--ok:#2f7a43}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Huninn,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;font-size:15px;line-height:1.6}
+button,input,textarea{font:inherit;color:inherit}
+.wrap{max-width:720px;margin:0 auto;padding:18px 14px 60px;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{margin:0;font-size:24px;letter-spacing:.06em;color:var(--denim)}
+.tabs{display:flex;gap:6px}
+.tab{min-height:40px;padding:0 16px;border-radius:999px;border:1.6px solid var(--denim);background:#fff;color:var(--denim);font-weight:700;cursor:pointer}
+.tab[aria-pressed=true]{background:var(--denim);color:#fff}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:14px}
+.lbl{font-size:15px;font-weight:700;color:var(--denim)}
+.lbl small{font-weight:400;color:var(--muted);font-size:12.5px;margin-left:4px}
+.field{display:flex;flex-direction:column;gap:6px}
+.in{width:100%;min-height:44px;padding:0 14px;border-radius:999px;border:1.6px solid var(--line2);background:#fff;font-size:14.5px}
+textarea.in{border-radius:10px;padding:10px 12px;min-height:84px;resize:vertical;font-size:14px}
+.hint{font-size:13px;color:var(--muted)}
+.hint b{color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{min-height:44px;padding:0 16px;border-radius:999px;border:1.6px solid var(--line2);background:#fff;font-size:15px;cursor:pointer}
+.chip.s{min-height:36px;padding:0 12px;font-size:13.5px}
+.chip[aria-pressed=true]{background:var(--denim);border-color:var(--denim);color:#fff}
+.btn{min-height:44px;padding:0 18px;border-radius:999px;border:1.6px solid var(--denim);background:var(--soft);color:var(--denim);font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.main{background:var(--denim);color:#fff;min-height:50px;font-size:15.5px}
+.btn.ghost{border-color:var(--line2);background:#fff;color:var(--muted);font-weight:400}
+.btn:disabled{background:#dfe6f3;border-color:#dfe6f3;color:#7d8bab;cursor:not-allowed}
+.drop{min-height:120px;border-radius:12px;border:2px dashed #9fb6e0;background:#f2f6fd;color:var(--denim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;text-align:center;padding:10px}
+.drop.over{background:#e2ebfb}
+.imgs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media(min-width:560px){.imgs{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.im{position:relative;aspect-ratio:4/5;border-radius:8px;border:1.5px solid var(--line);background:#dfe7f6;padding:0;overflow:hidden;cursor:pointer}
+.im img{display:block;width:100%;height:100%;object-fit:cover}
+.im .no{position:absolute;left:5px;top:5px;padding:0 6px;border-radius:999px;background:rgba(255,255,255,.88);font-size:12px;font-weight:700;color:#3f5a96}
+.im .th{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);padding:2px 8px;border-radius:999px;background:var(--denim);color:#fff;font-size:11.5px;font-weight:700;white-space:nowrap}
+.im[aria-pressed=true]{border:3px solid var(--denim)}
+.check{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--denim)}
+.q{display:flex;flex-direction:column;gap:6px}
+.qi{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:13.5px;cursor:pointer;text-align:left}
+.qi[aria-current=true]{border-color:var(--denim);background:var(--soft)}
+.qi .c{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qi .d{font-size:13px;color:var(--muted)}
+.bd{flex:0 0 auto;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;background:#eef3fc;color:var(--muted)}
+.bd.cur{background:var(--denim);color:#fff}.bd.done{background:#d6f0dc;color:#1f6a30}.bd.has{background:#fff3c4;color:#6b5200}
+.msg{font-size:13.5px;padding:10px 12px;border-radius:10px;background:#fdecef;color:var(--bad)}
+.msg.ok{background:#e6f5ea;color:var(--ok)}
+.msg.info{background:var(--soft);color:var(--denim)}
+.kv{display:flex;gap:10px;font-size:13px;border-bottom:1px dashed var(--line);padding:4px 0}
+.kv span:first-child{flex:0 0 6.5em;color:var(--muted)}
+.kv span:last-child{flex:1;min-width:0;word-break:break-all}
+code{font-size:12.5px;background:#eef3fc;padding:8px 10px;border-radius:8px;word-break:break-all;white-space:pre-line;display:block}
+.frow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.frow>span{font-size:13px;font-weight:700;color:var(--denim);min-width:3em}
+.years{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.months{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.mo{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:48px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;line-height:1.25}
+.mo b{font-size:14px}.mo small{font-size:11px;color:var(--muted)}
+.mo:disabled{background:#f3f5f9;color:#a3aec4;cursor:default}
+.mo[aria-pressed=true]{background:var(--denim);border-color:var(--denim);color:#fff}.mo[aria-pressed=true] small{color:#fff}
+.polas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}
+@media(min-width:560px){.polas{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pola{display:block;padding:8px 8px 0;background:#fffdf7;border:0;border-radius:3px;box-shadow:0 3px 10px rgba(30,60,120,.18);text-align:left;cursor:pointer;color:#2a2a3a}
+.pp{position:relative;display:block;aspect-ratio:4/5;background:repeating-linear-gradient(135deg,rgba(255,255,255,.55) 0 8px,transparent 8px 16px),linear-gradient(160deg,#cfdcf5,#b9cbee);overflow:hidden}
+.pp img{display:block;width:100%;height:100%;object-fit:cover}
+.tg{position:absolute;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:700}
+.tg.src{left:6px;top:6px;background:rgba(255,255,255,.9);color:var(--denim)}.tg.src.blog{background:#fff3c4;color:#6b5200}
+.tg.who{right:6px;top:6px;background:#d9e7fc;color:#2b3a67}.tg.who.k{background:#ffe1e8;color:#8a2f4c}
+.tg.ss{left:6px;bottom:6px;background:rgba(255,255,255,.9);color:var(--denim)}
+.tg.n{right:6px;bottom:6px;background:rgba(27,42,76,.75);color:#fff;font-weight:400}
+.pc{display:flex;flex-direction:column;gap:2px;padding:8px 2px 10px}
+.pc b{font-size:15px;color:var(--denim)}
+.pc .cap{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc .hid{align-self:flex-start;padding:1px 7px;border-radius:999px;background:#eef0f4;color:var(--muted);font-size:11px}
+dialog{width:min(94vw,560px);max-width:none;max-height:92vh;padding:0;border:0;border-radius:16px;background:#fff;box-shadow:0 20px 40px -12px rgba(20,30,70,.55)}
+dialog::backdrop{background:rgba(20,30,70,.5)}
+.dh{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;border-bottom:1.5px dashed rgba(43,58,103,.25)}
+.dh b{flex:1;min-width:0;color:var(--denim)}
+.x{width:44px;height:44px;border:0;border-radius:50%;background:var(--soft);color:var(--denim);font-size:20px;cursor:pointer}
+.db{padding:12px 14px 16px;display:flex;flex-direction:column;gap:12px}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.strip .im{flex:0 0 110px;cursor:default}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>私服穿搭後台</h1>
+    <div class="tabs">
+      <button type="button" class="tab" id="tabAdd" aria-pressed="true">新增</button>
+      <button type="button" class="tab" id="tabLib" aria-pressed="false">檔案庫</button>
+    </div>
+  </div>
+  <div id="globalMsg" class="msg" hidden></div>
+
+  <!-- 新增 -->
+  <section id="viewAdd" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card" id="batchCard">
+      <label class="lbl" for="batch">批次模式：一次貼多個 IG 連結<small>一行一個</small></label>
+      <textarea id="batch" class="in" placeholder="https://www.instagram.com/p/…&#10;https://www.instagram.com/p/…"></textarea>
+      <button type="button" class="btn" id="addQueue" style="align-self:flex-start">加入待處理清單</button>
+      <div class="q" id="queue" hidden></div>
+    </div>
+
+    <form class="card" id="form" autocomplete="off">
+      <div id="editNote" class="msg info" hidden></div>
+      <div class="field">
+        <span class="lbl">來源</span>
+        <div class="chips" id="srcChips"></div>
+      </div>
+      <div class="field" id="igBox">
+        <label class="lbl" for="link">① IG 貼文連結</label>
+        <input id="link" class="in" type="url" placeholder="貼上 IG 貼文連結">
+        <span class="hint">貼文日期：<b id="dateText">貼上連結後自動帶入</b></span>
+      </div>
+      <div class="field" id="blogBox" hidden>
+        <label class="lbl" for="blink">① 網友備份連結<small>選填，只存在後台，前台不顯示</small></label>
+        <input id="blink" class="in" type="url" placeholder="貼上網友備份這篇部落格的連結">
+        <label class="lbl" for="bdate" style="margin-top:6px">部落格日期<small>手動選</small></label>
+        <input id="bdate" class="in" type="date">
+      </div>
+      <div class="field">
+        <span class="lbl">② 人物</span>
+        <div class="chips" id="whoChips"></div>
+      </div>
+      <div class="field">
+        <span class="lbl">③ 季節<small>可以複選</small></span>
+        <div class="chips" id="seasonChips"></div>
+      </div>
+      <div class="field">
+        <span class="lbl">④ 整組圖片</span>
+        <label class="drop" id="drop" for="files">
+          <b>放入圖片</b>
+          <span class="hint">從相簿選，或把 saveclip 下載的圖拖進來（會依檔名排序）</span>
+        </label>
+        <input id="files" type="file" accept="image/*" multiple hidden>
+        <span class="hint" id="imgNote" hidden></span>
+        <div class="imgs" id="imgs"></div>
+        <button type="button" class="btn ghost" id="clearImgs" style="align-self:flex-start" hidden>重新放入整組</button>
+      </div>
+      <div class="field">
+        <label class="lbl" for="caption">⑤ 貼文文字<small>選填，存了之後檔案庫可以搜尋</small></label>
+        <textarea id="caption" class="in" placeholder="從 saveclip 複製貼文文字貼在這裡"></textarea>
+      </div>
+      <label class="check" for="show"><input id="show" type="checkbox" checked> 顯示在網站的私服穿搭頁</label>
+      <span class="hint" id="missing" style="color:var(--bad)"></span>
+      <div id="formMsg" class="msg" hidden></div>
+      <button type="submit" class="btn main" id="confirm" disabled>確認：備份到 R2 並寫入試算表</button>
+      <button type="button" class="btn ghost" id="cancelEdit" hidden>取消修改，改成新增</button>
+    </form>
+
+    <div class="card" id="doneCard" hidden>
+      <b style="font-size:18px;color:var(--ok)">✓ 完成</b>
+      <div class="field" id="doneR2"></div>
+      <div class="field">
+        <span class="lbl" style="font-size:13.5px">已寫入試算表「私服穿搭」分頁<span id="doneRow"></span></span>
+        <div id="doneKV"></div>
+      </div>
+      <button type="button" class="btn main" id="next">新增下一篇</button>
+    </div>
+  </section>
+
+  <!-- 檔案庫 -->
+  <section id="viewLib" hidden style="flex-direction:column;gap:14px">
+    <div class="field">
+      <label class="lbl" for="q" style="font-size:13px">搜尋貼文文字、備註</label>
+      <input id="q" class="in" type="search" placeholder="例如：ディズニー">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="frow"><span>來源</span><div class="chips" id="fSrc"></div></div>
+      <div class="frow"><span>人物</span><div class="chips" id="fWho"></div></div>
+      <div class="frow"><span>季節</span><div class="chips" id="fSeason"></div></div>
+    </div>
+    <div class="card" id="cal" style="gap:10px;padding:12px">
+      <div class="years" id="years"></div>
+      <div class="months" id="months"></div>
+      <button type="button" class="chip s" id="allYear" style="align-self:flex-start"></button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span class="lbl" style="font-size:14px" id="libHead"></span>
+      <button type="button" class="btn ghost" id="reload" style="min-height:36px">重新讀取</button>
+    </div>
+    <div class="polas" id="polas"></div>
+    <p class="empty" id="libEmpty" hidden>沒有符合的貼文</p>
+  </section>
+</div>
+
+<dialog id="dlg">
+  <div class="dh"><b id="dTitle"></b><button type="button" class="x" id="dClose" aria-label="關閉">×</button></div>
+  <div class="db">
+    <div class="strip" id="dImgs"></div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:13.5px" id="dInfo"></div>
+    <div class="chips" id="dBtns"></div>
+    <div id="dMsg" class="msg" hidden></div>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+  var R2 = 'https://pub-ce81db85078f428e84825b9267b26b5c.r2.dev/';
+  var API = '/admin/api/';
+  var SEASONS = ['春', '夏', '秋', '冬'];
+  var PEOPLE = ['加藤史帆', '佐々木久美'];
+  var A64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function pad(n) { return ('0' + n).slice(-2); }
+  function igCode(u) { var m = /instagram\.com\/(?:[\w.]+\/)?(?:p|reel|reels|tv)\/([\w-]+)/i.exec(u || ''); return m ? m[1] : ''; }
+  function igDate(c) {
+    try {
+      var n = BigInt(0);
+      for (var i = 0; i < c.length; i++) { var k = A64.indexOf(c[i]); if (k < 0) return null; n = n * BigInt(64) + BigInt(k); }
+      var d = new Date(Number((n >> BigInt(23)) + BigInt('1314220021721')) + 8 * 3600e3), y = d.getUTCFullYear();
+      if (!(y >= 2012 && y <= 2100)) return null;
+      return { y: y, m: d.getUTCMonth() + 1, s: y + '.' + pad(d.getUTCMonth() + 1) + '.' + pad(d.getUTCDate()) };
+    } catch (e) { return null; }
+  }
+  function parseDate(s) {
+    var m = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(String(s || ''));
+    return m ? { y: +m[1], m: +m[2], s: m[1] + '.' + pad(m[2]) + '.' + pad(m[3]) } : null;
+  }
+  function folderOf(who) { return who === '佐々木久美' ? 'kumi' : 'kato'; }
+  function sortSeasons(a) { return a.slice().sort(function (x, y) { return SEASONS.indexOf(x) - SEASONS.indexOf(y); }); }
+  function showMsg(el, text, kind) { el.className = 'msg' + (kind ? ' ' + kind : ''); el.textContent = text; el.hidden = !text; }
+
+  async function api(path, opt) {
+    var r = await fetch(API + path, opt);
+    var j = null;
+    try { j = await r.json(); } catch (e) {}
+    if (!r.ok || !j || j.ok === false) throw new Error((j && j.error) || ('伺服器錯誤 ' + r.status));
+    return j;
+  }
+
+  /* ---------- 試算表資料 ---------- */
+  var items = [], loaded = false;
+  var COLS = { who: /^人物/, date: /^日期/, link: /^IG|^連結/, seasons: /^季節/, note: /^備註/, thumb: /^縮圖/, src: /^來源/, caption: /^貼文文字/, n: /^張數/, folder: /^備份資料夾/, blink: /^備份來源/, show: /^顯示/ };
+  async function loadRows() {
+    var j = await api('sheet');
+    var h = j.header.map(function (x) { return String(x).trim(); }), ci = {};
+    Object.keys(COLS).forEach(function (k) { ci[k] = h.findIndex(function (x) { return COLS[k].test(x); }); });
+    var g = function (r, k) { return ci[k] >= 0 ? String(r[ci[k]] || '').trim() : ''; };
+    items = [];
+    j.rows.forEach(function (r, i) {
+      if (!r.some(function (x) { return String(x).trim(); })) return;
+      var link = g(r, 'link'), code = igCode(link), src = /部落格|blog/i.test(g(r, 'src')) ? 'blog' : 'ig';
+      var d = parseDate(g(r, 'date')) || (code ? igDate(code) : null);
+      items.push({
+        row: i + 2, src: src, who: /久美/.test(g(r, 'who')) ? '佐々木久美' : '加藤史帆',
+        link: link, code: code, date: d, seasons: g(r, 'seasons'), note: g(r, 'note'), thumb: g(r, 'thumb'),
+        caption: g(r, 'caption'), n: parseInt(g(r, 'n'), 10) || 0, folder: g(r, 'folder'), blink: g(r, 'blink'),
+        show: /✓|v|true|y|是|顯示/i.test(g(r, 'show'))
+      });
+    });
+    loaded = true;
+  }
+  function findByCode(c) { return items.filter(function (x) { return x.code === c; })[0]; }
+
+  /* ---------- 新增／修改表單 ---------- */
+  var F = blankForm();
+  function blankForm(src) {
+    return { src: src || 'ig', who: F ? F.who : '加藤史帆', seasons: [], files: [], thumb: 0, editRow: 0, edit: null, replace: false };
+  }
+  var queue = [], cur = -1;
+
+  function chip(label, on, cls) { return '<button type="button" class="chip' + (cls ? ' ' + cls : '') + '" aria-pressed="' + on + '" data-v="' + esc(label) + '">' + esc(label) + '</button>'; }
+  function renderChips() {
+    $('srcChips').innerHTML = chip('IG', F.src === 'ig') + chip('部落格', F.src === 'blog');
+    $('whoChips').innerHTML = PEOPLE.map(function (p) { return chip(p, F.who === p); }).join('');
+    $('seasonChips').innerHTML = SEASONS.map(function (s) { return chip(s, F.seasons.indexOf(s) >= 0); }).join('');
+    $('igBox').hidden = F.src !== 'ig';
+    $('blogBox').hidden = F.src !== 'blog';
+  }
+  function curDate() {
+    if (F.src === 'blog') { var v = $('bdate').value; return v ? parseDate(v) : null; }
+    var c = igCode($('link').value); return c ? igDate(c) : null;
+  }
+  function existingImgs() {
+    if (!F.edit || !F.edit.folder || !F.edit.n || F.replace) return [];
+    var out = [];
+    for (var i = 1; i <= F.edit.n; i++) out.push(R2 + F.edit.folder + pad(i) + '.jpg');
+    return out;
+  }
+  function renderImgs() {
+    var ex = existingImgs(), urls = F.files.length ? F.files.map(function (f) { return f.url; }) : ex;
+    $('drop').hidden = urls.length > 0;
+    $('clearImgs').hidden = !urls.length;
+    $('imgNote').hidden = !urls.length;
+    $('imgNote').textContent = F.files.length
+      ? '共 ' + urls.length + ' 張，全部都會備份；點一張設為縮圖'
+      : '目前備份了 ' + urls.length + ' 張；點一張換縮圖，或按「重新放入整組」換掉整組';
+    $('imgs').innerHTML = urls.map(function (u, i) {
+      return '<button type="button" class="im" data-i="' + i + '" aria-pressed="' + (i === F.thumb) + '" aria-label="第 ' + (i + 1) + ' 張，設為縮圖"><img src="' + esc(u) + '" alt=""><span class="no">' + pad(i + 1) + '</span>' + (i === F.thumb ? '<span class="th">★ 縮圖</span>' : '') + '</button>';
+    }).join('');
+    if (F.edit && !urls.length && F.edit.thumb) {
+      $('imgNote').hidden = false;
+      $('imgNote').innerHTML = '這篇還沒有整組備份，目前縮圖是：<br><img src="' + esc(F.edit.thumb) + '" alt="" style="width:96px;border-radius:6px;margin-top:4px">';
+    }
+  }
+  function validate() {
+    var d = curDate(), miss = [];
+    if (!d) miss.push(F.src === 'blog' ? '部落格日期' : '貼文連結');
+    if (!F.seasons.length) miss.push('季節');
+    if (!F.files.length && !existingImgs().length && !F.edit) miss.push('圖片');
+    $('dateText').textContent = F.src === 'ig' ? (d ? d.s + '（從連結自動算出）' : ($('link').value ? '連結格式無法辨識' : '貼上連結後自動帶入')) : '';
+    $('missing').textContent = miss.length ? '還缺：' + miss.join('、') : '';
+    $('confirm').disabled = miss.length > 0 || busy;
+    return !miss.length;
+  }
+  function renderForm() { renderChips(); renderImgs(); validate(); }
+
+  function resetForm(src) {
+    F.files.forEach(function (f) { URL.revokeObjectURL(f.url); });
+    F = blankForm(src);
+    $('link').value = ''; $('blink').value = ''; $('bdate').value = ''; $('caption').value = ''; $('show').checked = true;
+    $('editNote').hidden = true; $('cancelEdit').hidden = true;
+    showMsg($('formMsg'), '');
+    $('form').hidden = false; $('doneCard').hidden = true;
+    renderForm();
+  }
+  function loadEdit(it) {
+    resetForm(it.src);
+    F.who = it.who; F.editRow = it.row; F.edit = it;
+    F.seasons = sortSeasons(SEASONS.filter(function (s) { return it.seasons.indexOf(s) >= 0 || /四季|全年/.test(it.seasons); }));
+    if (it.src === 'ig') $('link').value = it.link;
+    else { $('blink').value = it.blink; if (it.date) $('bdate').value = it.date.s.replace(/\./g, '-'); }
+    $('caption').value = it.caption; $('show').checked = it.show;
+    if (it.folder && it.n && it.thumb) {
+      var m = /\/(\d{2})\.jpg$/.exec(it.thumb); F.thumb = m ? +m[1] - 1 : 0;
+    }
+    $('editNote').hidden = false; $('editNote').textContent = '正在修改試算表第 ' + it.row + ' 列（' + (it.date ? it.date.s : '日期不明') + '・' + it.who + '）';
+    $('cancelEdit').hidden = false;
+    renderForm();
+    switchTab('add');
+    window.scrollTo(0, 0);
+  }
+
+  $('srcChips').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var s = b.dataset.v === 'IG' ? 'ig' : 'blog';
+    if (s !== F.src) { cur = s === 'ig' ? cur : -1; resetForm(s); renderQueue(); }
+  });
+  $('whoChips').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { F.who = b.dataset.v; renderForm(); } });
+  $('seasonChips').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var v = b.dataset.v, i = F.seasons.indexOf(v);
+    if (i >= 0) F.seasons.splice(i, 1); else F.seasons = sortSeasons(F.seasons.concat([v]));
+    renderForm();
+  });
+  $('link').addEventListener('input', function () {
+    validate();
+    var c = igCode($('link').value), ex = c && loaded && findByCode(c);
+    if (ex && ex.row !== F.editRow) {
+      loadEdit(ex);
+      showMsg($('formMsg'), '這篇已經在試算表裡了，已切換成修改模式。', 'info');
+    }
+  });
+  ['blink', 'bdate', 'caption'].forEach(function (id) { $(id).addEventListener('input', validate); });
+
+  function addFiles(list) {
+    var fs = Array.prototype.filter.call(list, function (f) { return /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic)$/i.test(f.name); });
+    if (!fs.length) return;
+    fs.sort(function (a, b) { return a.name.localeCompare(b.name, undefined, { numeric: true }); });
+    F.files.forEach(function (f) { URL.revokeObjectURL(f.url); });
+    F.files = fs.map(function (f) { return { file: f, url: URL.createObjectURL(f) }; });
+    F.thumb = 0;
+    if (F.edit && F.edit.folder) F.replace = true;
+    renderForm();
+  }
+  $('files').addEventListener('change', function () { addFiles(this.files); this.value = ''; });
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { addFiles(e.dataTransfer.files); });
+  $('imgs').addEventListener('click', function (e) { var b = e.target.closest('.im'); if (b) { F.thumb = +b.dataset.i; renderImgs(); } });
+  $('clearImgs').addEventListener('click', function () {
+    F.files.forEach(function (f) { URL.revokeObjectURL(f.url); });
+    F.files = []; F.thumb = 0;
+    if (F.edit && F.edit.folder) F.replace = true;
+    renderForm();
+    $('files').click();
+  });
+  $('cancelEdit').addEventListener('click', function () { cur = -1; resetForm(F.src); renderQueue(); });
+
+  function toJpeg(file) {
+    if (file.type === 'image/jpeg' && file.size <= 8 * 1024 * 1024) return Promise.resolve(file);
+    return new Promise(function (res, rej) {
+      var img = new Image(), u = URL.createObjectURL(file);
+      img.onload = function () {
+        var max = 2160, w = img.naturalWidth, h = img.naturalHeight, s = Math.min(1, max / Math.max(w, h));
+        var c = document.createElement('canvas'); c.width = Math.round(w * s); c.height = Math.round(h * s);
+        var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(u);
+        c.toBlob(function (b) { b ? res(b) : rej(new Error('圖片轉檔失敗')); }, 'image/jpeg', 0.9);
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); rej(new Error('有一張圖讀不出來：' + file.name)); };
+      img.src = u;
+    });
+  }
+  function uniqueFolder(base) {
+    var used = {}; items.forEach(function (x) { if (x.folder && x.row !== F.editRow) used[x.folder] = 1; });
+    if (!used[base + '/']) return base + '/';
+    for (var i = 2; ; i++) if (!used[base + '-' + i + '/']) return base + '-' + i + '/';
+  }
+
+  var busy = false;
+  $('form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    if (busy || !validate()) return;
+    busy = true; $('confirm').disabled = true;
+    var msg = $('formMsg');
+    try {
+      if (!loaded) { showMsg(msg, '讀取試算表中…', 'info'); await loadRows(); }
+      var d = curDate(), blog = F.src === 'blog';
+      var code = blog ? d.s.replace(/\./g, '-') : igCode($('link').value);
+      if (!blog && !F.editRow) { var ex = findByCode(code); if (ex) F.editRow = ex.row; }
+      var fields = {
+        src: blog ? '部落格' : 'IG', who: F.who, date: d.s,
+        link: blog ? '' : $('link').value.trim(), blink: blog ? $('blink').value.trim() : '',
+        seasons: F.seasons.join(''), caption: $('caption').value.trim(), show: $('show').checked ? '✓' : ''
+      };
+      var folder = F.edit && F.edit.folder, uploaded = [];
+      if (F.files.length) {
+        if (folder) {
+          showMsg(msg, '清掉舊的備份圖…', 'info');
+          await api('upload?prefix=' + encodeURIComponent(folder), { method: 'DELETE' });
+        } else {
+          folder = uniqueFolder('outfit/' + (blog ? 'blog' : 'ig') + '/' + folderOf(F.who) + '/' + d.y + '/' + code);
+        }
+        for (var i = 0; i < F.files.length; i++) {
+          showMsg(msg, '上傳中… ' + (i + 1) + ' / ' + F.files.length, 'info');
+          var blob = await toJpeg(F.files[i].file), key = folder + pad(i + 1) + '.jpg';
+          await api('upload?key=' + encodeURIComponent(key), { method: 'PUT', body: blob, headers: { 'Content-Type': 'image/jpeg' } });
+          uploaded.push(key);
+        }
+        fields.folder = folder; fields.n = String(F.files.length);
+        fields.thumb = R2 + folder + pad(F.thumb + 1) + '.jpg';
+      } else if (existingImgs().length) {
+        fields.thumb = R2 + folder + pad(F.thumb + 1) + '.jpg';
+      }
+      showMsg(msg, '寫入試算表…', 'info');
+      var res = await api('sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: F.editRow || 0, fields: fields }) });
+      if (cur >= 0 && queue[cur]) queue[cur].done = true;
+      showDone(fields, uploaded, res.row);
+      loadRows().then(function () { renderQueue(); if (!$('viewLib').hidden) renderLib(); }).catch(function () {});
+    } catch (err) {
+      showMsg(msg, '失敗：' + err.message + '（可以再按一次確認重試）');
+    } finally {
+      busy = false; validate();
+    }
+  });
+
+  var LABELS = { src: '來源', who: '人物', date: '日期', link: '連結', blink: '備份來源連結', seasons: '季節', thumb: '縮圖', caption: '貼文文字', n: '張數', folder: '備份資料夾', show: '顯示' };
+  function showDone(f, uploaded, row) {
+    $('form').hidden = true; $('doneCard').hidden = false;
+    $('doneR2').innerHTML = uploaded.length
+      ? '<span class="lbl" style="font-size:13.5px">已備份到 R2（' + uploaded.length + ' 張）</span><code>' + esc(uploaded.join('\n')) + '</code>'
+      : '<span class="hint">這次沒有上傳新圖片</span>';
+    $('doneRow').textContent = '（第 ' + row + ' 列）';
+    $('doneKV').innerHTML = Object.keys(LABELS).filter(function (k) { return k in f; }).map(function (k) {
+      var v = f[k]; if (k === 'caption' && v.length > 40) v = v.slice(0, 40) + '…';
+      return '<div class="kv"><span>' + LABELS[k] + '</span><span>' + esc(v || '（空白）') + '</span></div>';
+    }).join('');
+    var left = queue.filter(function (q) { return !q.done; }).length;
+    $('next').textContent = left ? '下一篇（還剩 ' + left + ' 篇）' : '新增下一篇';
+    renderQueue();
+    window.scrollTo(0, 0);
+  }
+  $('next').addEventListener('click', function () {
+    var i = queue.findIndex(function (q) { return !q.done; });
+    if (i >= 0) pickQueue(i); else { cur = -1; resetForm(F.src); renderQueue(); }
+  });
+
+  /* ---------- 批次待處理清單 ---------- */
+  function renderQueue() {
+    var box = $('queue');
+    box.hidden = !queue.length;
+    if (!queue.length) return;
+    queue.forEach(function (q) { var ex = loaded && findByCode(q.code); q.exists = !!ex; q.backed = !!(ex && ex.folder); });
+    var left = queue.filter(function (q) { return !q.done; }).length;
+    box.innerHTML = '<span class="hint">共 ' + queue.length + ' 篇，還剩 ' + left + ' 篇' + (loaded ? '' : '（讀取試算表中…）') + '</span>' +
+      queue.map(function (q, i) {
+        var st = q.done ? ['已完成', 'done'] : i === cur ? ['處理中', 'cur'] : q.backed ? ['已備份過', 'has'] : q.exists ? ['已在試算表', 'has'] : ['待處理', ''];
+        return '<button type="button" class="qi" data-i="' + i + '" aria-current="' + (i === cur && !q.done) + '"><span class="c">' + esc(q.code) + '</span><span class="d">' + esc(q.date) + '</span><span class="bd ' + st[1] + '">' + st[0] + '</span></button>';
+      }).join('');
+  }
+  function pickQueue(i) {
+    cur = i;
+    var ex = loaded && findByCode(queue[i].code);
+    if (ex) loadEdit(ex); else { resetForm('ig'); $('link').value = queue[i].link; validate(); }
+    renderQueue();
+  }
+  $('queue').addEventListener('click', function (e) { var b = e.target.closest('.qi'); if (b) pickQueue(+b.dataset.i); });
+  $('addQueue').addEventListener('click', function () {
+    var seen = {}; queue.forEach(function (q) { seen[q.code] = 1; });
+    $('batch').value.split(/\s+/).forEach(function (l) {
+      var c = igCode(l); if (!c || seen[c]) return; seen[c] = 1;
+      var d = igDate(c); queue.push({ link: l.trim(), code: c, date: d ? d.s : '日期無法辨識', done: false });
+    });
+    $('batch').value = '';
+    var first = queue.findIndex(function (q) { return !q.done; });
+    if (cur < 0 && first >= 0) pickQueue(first); else renderQueue();
+  });
+
+  /* ---------- 檔案庫 ---------- */
+  var L = { q: '', src: '全部', who: '全部', season: '全部', year: 0, month: 0 };
+  function libBase() {
+    return items.filter(function (x) {
+      return (L.src === '全部' || (L.src === 'IG') === (x.src === 'ig')) &&
+        (L.who === '全部' || x.who === L.who) &&
+        (L.season === '全部' || x.seasons.indexOf(L.season) >= 0 || /四季|全年/.test(x.seasons));
+    });
+  }
+  function chipsHTML(list, val) { return list.map(function (n) { return chip(n, n === val, 's'); }).join(''); }
+  function renderLib() {
+    $('fSrc').innerHTML = chipsHTML(['全部', 'IG', '部落格'], L.src);
+    $('fWho').innerHTML = chipsHTML(['全部'].concat(PEOPLE), L.who);
+    $('fSeason').innerHTML = chipsHTML(['全部'].concat(SEASONS), L.season);
+    var base = libBase(), q = L.q.trim(), list;
+    var ys = {}; base.forEach(function (x) { ys[x.date ? x.date.y : 0] = 1; });
+    var years = Object.keys(ys).map(Number).sort(function (a, b) { return b - a; });
+    if (!L.year || !ys[L.year]) L.year = years.filter(Boolean)[0] || (ys[0] ? -1 : new Date().getFullYear());
+    $('cal').hidden = !!q;
+    $('years').innerHTML = years.map(function (y) { return '<button type="button" class="chip s" data-y="' + (y || -1) + '" aria-pressed="' + ((y || -1) === L.year) + '">' + (y || '日期不明') + '</button>'; }).join('');
+    var inYear = base.filter(function (x) { return L.year === -1 ? !x.date : x.date && x.date.y === L.year; });
+    $('months').hidden = L.year === -1; $('allYear').hidden = L.year === -1;
+    var mh = '';
+    for (var m = 1; m <= 12; m++) {
+      var c = inYear.filter(function (x) { return x.date.m === m; }).length;
+      mh += '<button type="button" class="mo" data-m="' + m + '" ' + (c ? '' : 'disabled ') + 'aria-pressed="' + (m === L.month) + '"><b>' + m + '月</b><small>' + (c ? c + ' 篇' : '—') + '</small></button>';
+    }
+    $('months').innerHTML = mh;
+    $('allYear').textContent = '看 ' + L.year + ' 全年'; $('allYear').setAttribute('aria-pressed', String(!L.month));
+    if (q) {
+      list = base.filter(function (x) { return (x.caption + '\n' + x.note).toLowerCase().indexOf(q.toLowerCase()) >= 0; });
+      $('libHead').textContent = '搜尋「' + q + '」：' + list.length + ' 篇';
+    } else {
+      list = inYear.filter(function (x) { return !L.month || (x.date && x.date.m === L.month); });
+      $('libHead').textContent = (L.year === -1 ? '日期不明' : L.year + ' 年' + (L.month ? ' ' + L.month + ' 月' : '全年')) + '：' + list.length + ' 篇';
+    }
+    list.sort(function (a, b) { return (b.date ? b.date.s : '') < (a.date ? a.date.s : '') ? -1 : 1; });
+    $('polas').innerHTML = list.map(function (x) {
+      var k = x.who === '佐々木久美';
+      return '<button type="button" class="pola" data-row="' + x.row + '"><span class="pp">' +
+        (x.thumb ? '<img src="' + esc(x.thumb) + '" alt="" loading="lazy">' : '') +
+        '<span class="tg src' + (x.src === 'blog' ? ' blog' : '') + '">' + (x.src === 'blog' ? '部落格' : 'IG') + '</span>' +
+        '<span class="tg who' + (k ? ' k' : '') + '">' + (k ? '久美' : '史帆') + '</span>' +
+        (x.seasons ? '<span class="tg ss">' + esc(x.seasons) + '</span>' : '') +
+        (x.n ? '<span class="tg n">' + x.n + ' 張</span>' : '') +
+        '</span><span class="pc"><b>' + (x.date ? x.date.s : '日期不明') + '</b><span class="cap">' + esc(x.caption || x.note || ' ') + '</span>' +
+        (x.show ? '' : '<span class="hid">未放上網站</span>') + '</span></button>';
+    }).join('');
+    $('libEmpty').hidden = list.length > 0;
+  }
+  function pickFilter(id, key) {
+    $(id).addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { L[key] = b.dataset.v; renderLib(); } });
+  }
+  pickFilter('fSrc', 'src'); pickFilter('fWho', 'who'); pickFilter('fSeason', 'season');
+  $('q').addEventListener('input', function () { L.q = this.value; renderLib(); });
+  $('years').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { L.year = +b.dataset.y; L.month = 0; renderLib(); } });
+  $('months').addEventListener('click', function (e) { var b = e.target.closest('.mo'); if (b && !b.disabled) { L.month = +b.dataset.m; renderLib(); } });
+  $('allYear').addEventListener('click', function () { L.month = 0; renderLib(); });
+  $('reload').addEventListener('click', function () { openLib(true); });
+
+  var dlg = $('dlg'), dItem = null;
+  function imgsOf(x) {
+    var out = [];
+    if (x.folder && x.n) for (var i = 1; i <= x.n; i++) out.push(R2 + x.folder + pad(i) + '.jpg');
+    else if (x.thumb) out.push(x.thumb);
+    return out;
+  }
+  $('polas').addEventListener('click', function (e) {
+    var b = e.target.closest('.pola'); if (!b) return;
+    var x = items.filter(function (i) { return i.row === +b.dataset.row; })[0]; if (!x) return;
+    dItem = x;
+    $('dTitle').textContent = (x.date ? x.date.s : '日期不明') + '・' + x.who;
+    $('dImgs').innerHTML = imgsOf(x).map(function (u, i) {
+      return '<span class="im"' + (u === x.thumb ? ' aria-pressed="true"' : '') + '><img src="' + esc(u) + '" alt="" loading="lazy"><span class="no">' + pad(i + 1) + '</span>' + (u === x.thumb ? '<span class="th">★ 縮圖</span>' : '') + '</span>';
+    }).join('') || '<span class="hint">沒有圖片</span>';
+    $('dInfo').innerHTML =
+      '<span><span class="hint">來源：</span>' + (x.src === 'blog' ? '部落格' : 'IG') + '　<span class="hint">季節：</span>' + esc(x.seasons || '—') + '　<span class="hint">試算表：</span>第 ' + x.row + ' 列</span>' +
+      (x.folder ? '<span><span class="hint">備份資料夾：</span><code style="display:inline;padding:1px 6px">' + esc(x.folder) + '</code></span>' : '<span class="hint">還沒有整組備份</span>') +
+      (x.caption ? '<span style="white-space:pre-line"><span class="hint">貼文文字：</span>' + esc(x.caption) + '</span>' : '') +
+      (x.note ? '<span><span class="hint">備註：</span>' + esc(x.note) + '</span>' : '');
+    var src = x.src === 'ig' ? x.link : x.blink;
+    $('dBtns').innerHTML =
+      (src ? '<a class="btn main" style="min-height:44px;font-size:14px" href="' + esc(src) + '" target="_blank" rel="noopener noreferrer">' + (x.src === 'ig' ? '打開 IG 原貼文' : '打開網友備份連結') + '</a>' : '') +
+      (x.folder && x.n ? '<button type="button" class="btn" id="dDl">下載整組</button>' : '') +
+      '<button type="button" class="btn ghost" id="dEdit">修改資訊／換縮圖</button>';
+    showMsg($('dMsg'), '');
+    dlg.showModal();
+  });
+  $('dClose').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+  $('dBtns').addEventListener('click', async function (e) {
+    var b = e.target.closest('button'); if (!b || !dItem) return;
+    if (b.id === 'dEdit') { dlg.close(); cur = -1; renderQueue(); loadEdit(dItem); }
+    if (b.id === 'dDl') {
+      var urls = imgsOf(dItem), base = (dItem.date ? dItem.date.s.replace(/\./g, '') : 'outfit') + '_' + (dItem.code || 'blog');
+      try {
+        for (var i = 0; i < urls.length; i++) {
+          showMsg($('dMsg'), '下載中… ' + (i + 1) + ' / ' + urls.length, 'info');
+          var blob = await (await fetch(urls[i])).blob(), a = document.createElement('a');
+          a.href = URL.createObjectURL(blob); a.download = base + '_' + pad(i + 1) + '.jpg';
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function (u) { URL.revokeObjectURL(u); }.bind(null, a.href), 4000);
+          await new Promise(function (r) { setTimeout(r, 350); });
+        }
+        showMsg($('dMsg'), '下載完成', 'ok');
+      } catch (err) { showMsg($('dMsg'), '下載失敗：' + err.message); }
+    }
+  });
+
+  /* ---------- 分頁切換 ---------- */
+  function switchTab(t) {
+    $('tabAdd').setAttribute('aria-pressed', String(t === 'add'));
+    $('tabLib').setAttribute('aria-pressed', String(t === 'lib'));
+    $('viewAdd').hidden = t !== 'add';
+    $('viewLib').hidden = t !== 'lib';
+    $('viewLib').style.display = t === 'lib' ? 'flex' : '';
+  }
+  async function openLib(force) {
+    switchTab('lib');
+    if (!loaded || force) {
+      $('libHead').textContent = '讀取試算表中…'; $('polas').innerHTML = '';
+      try { await loadRows(); } catch (err) { showMsg($('globalMsg'), '讀取試算表失敗：' + err.message); return; }
+    }
+    showMsg($('globalMsg'), '');
+    renderLib();
+  }
+  $('tabAdd').addEventListener('click', function () { switchTab('add'); });
+  $('tabLib').addEventListener('click', function () { openLib(false); });
+
+  resetForm('ig');
+  loadRows().then(renderQueue).catch(function (err) { showMsg($('globalMsg'), '讀取試算表失敗：' + err.message); });
+})();
+</script>
+</body>
+</html>
