@@ -363,7 +363,7 @@ a{color:inherit}
 /* 浮動展開按鈕：翻開後才出現，點開像一串膠帶標籤 */
 .fab{
   position:fixed;z-index:30;
-  right:max(16px,env(safe-area-inset-right,0px));
+  right:max(16px,env(safe-area-inset-right,0px),calc(50vw - 470px));
   bottom:calc(18px + env(safe-area-inset-bottom,0px));
   display:flex;flex-direction:column;align-items:flex-end;gap:6px;
 }
@@ -401,11 +401,11 @@ a{color:inherit}
 .fab-menu a span{
   display:block;padding:7px 22px;white-space:nowrap;
   font-family:var(--font-hand);font-size:21px;letter-spacing:.08em;color:var(--ink);
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),var(--tape);
+  background:radial-gradient(circle,rgba(255,255,255,.95) 1.3px,transparent 1.8px) 3px 3px/11px 11px,#bfe4f4;
   clip-path:polygon(2% 0,98% 0,100% 18%,98% 36%,100% 54%,98% 72%,100% 100%,2% 100%,0 80%,2% 60%,0 40%,2% 20%);
   filter:drop-shadow(0 1px 2px rgba(20,44,100,.3));
 }
-.fab-menu a:hover span{background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),#fff}
+.fab-menu a:hover span{background:#fff}
 
 
 .toast{
