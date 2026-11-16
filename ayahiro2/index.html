@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/img/icon-192.png">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <title>加藤史帆新手包 彩弘祭典</title>
 <meta name="description" content="《彩香最愛弘子前輩》的中字片段、訪談報導、S2業績與幕後花絮整理。">
 <meta property="og:type" content="website">
@@ -339,7 +340,7 @@ img[data-ph].fo{animation:phin .45s ease}
 </div>
 <button type="button" class="totop" id="toTop" aria-label="回到最上面" data-show="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg></button>
 <script src="../nav.js"></script>
-<script>(function(){function h(i){if(i.__f)return;i.__f=1;if(i.complete&&i.naturalWidth)return;i.classList.add('fx');function ok(){i.classList.add('fo');if(i.dataset.ph!=null)setTimeout(function(){i.style.backgroundImage='none'},500)}i.addEventListener('load',ok);i.addEventListener('error',function(){i.classList.add('fo')});if(i.complete&&i.naturalWidth)ok()}Array.prototype.forEach.call(document.images,h);if(window.MutationObserver)new MutationObserver(function(m){m.forEach(function(r){Array.prototype.forEach.call(r.addedNodes,function(n){if(n.nodeType!==1)return;if(n.tagName==='IMG')h(n);else if(n.querySelectorAll)Array.prototype.forEach.call(n.querySelectorAll('img'),h)})})}).observe(document.documentElement,{childList:true,subtree:true})})();</script>
+<script>(function(){function h(i){if(i.__f)return;i.__f=1;if(i.complete&&i.naturalWidth){if(i.dataset.ph!=null)i.style.backgroundImage='none';return}i.classList.add('fx');function ok(){i.classList.add('fo');if(i.dataset.ph!=null)setTimeout(function(){i.style.backgroundImage='none'},500)}i.addEventListener('load',ok);i.addEventListener('error',function(){i.classList.add('fo')});if(i.complete&&i.naturalWidth)ok()}Array.prototype.forEach.call(document.images,h);if(window.MutationObserver)new MutationObserver(function(m){m.forEach(function(r){Array.prototype.forEach.call(r.addedNodes,function(n){if(n.nodeType!==1)return;if(n.tagName==='IMG')h(n);else if(n.querySelectorAll)Array.prototype.forEach.call(n.querySelectorAll('img'),h)})})}).observe(document.documentElement,{childList:true,subtree:true})})();</script>
 <script>
 (function () {
   'use strict';
