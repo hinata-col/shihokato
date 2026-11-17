@@ -11,7 +11,8 @@
     { n: '彩弘祭典', u: 'ayahiro2/' },
     { n: '私服穿搭', u: 'outfit/' },
     { n: '行程', u: 'schedule/' },
-    { n: '相關資源', u: 'resources/' }
+    { n: '相關資源', u: 'resources/' },
+    { n: '關於本站', u: 'about/' }
   ];
   var script = document.currentScript;
   var base = script && script.src ? script.src.replace(/[^\/]*$/, '') : '/';
