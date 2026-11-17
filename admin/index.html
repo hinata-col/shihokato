@@ -95,6 +95,8 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
 .db{padding:12px 14px 16px;display:flex;flex-direction:column;gap:12px}
 .strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .strip .im{flex:0 0 110px;cursor:default}
+.strip .im.pick{cursor:pointer}
+.strip .im.busy{opacity:.55;pointer-events:none}
 .empty{padding:24px;text-align:center;color:var(--muted)}
 [hidden]{display:none!important}
 </style>
@@ -212,6 +214,8 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
   <div class="dh"><b id="dTitle"></b><button type="button" class="x" id="dClose" aria-label="關閉">×</button></div>
   <div class="db">
     <div class="strip" id="dImgs"></div>
+    <div class="hint" id="dTip" style="font-size:12.5px">點上面的圖可以直接設為縮圖</div>
+    <label class="check" id="dShowRow" for="dShow"><input id="dShow" type="checkbox"> 顯示在網站的私服穿搭頁</label>
     <div style="display:flex;flex-direction:column;gap:4px;font-size:13.5px" id="dInfo"></div>
     <div class="chips" id="dBtns"></div>
     <div id="dMsg" class="msg" hidden></div>
@@ -595,14 +599,49 @@ dialog::backdrop{background:rgba(20,30,70,.5)}
     else if (x.thumb) out.push(x.thumb);
     return out;
   }
+  function renderStrip() {
+    var x = dItem, can = !!(x.folder && x.n);
+    $('dImgs').innerHTML = imgsOf(x).map(function (u, i) {
+      var on = u === x.thumb;
+      return '<span class="im' + (can ? ' pick' : '') + '" data-i="' + i + '"' + (can ? ' role="button" tabindex="0" aria-label="第 ' + (i + 1) + ' 張，設為縮圖"' : '') + (on ? ' aria-pressed="true"' : '') + '><img src="' + esc(u) + '" alt="" loading="lazy"><span class="no">' + pad(i + 1) + '</span>' + (on ? '<span class="th">★ 縮圖</span>' : '') + '</span>';
+    }).join('') || '<span class="hint">沒有圖片</span>';
+  }
+  async function saveField(fields) {
+    return api('sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ row: dItem.row, fields: fields }) });
+  }
+  async function pickThumb(el) {
+    if (!dItem || !dItem.folder || !dItem.n || el.classList.contains('busy')) return;
+    var u = R2 + dItem.folder + pad(+el.dataset.i + 1) + '.jpg';
+    if (u === dItem.thumb) return;
+    var old = dItem.thumb; el.classList.add('busy');
+    showMsg($('dMsg'), '更換縮圖中…', 'info');
+    try {
+      await saveField({ thumb: u });
+      dItem.thumb = u; renderStrip(); renderLib();
+      showMsg($('dMsg'), '縮圖已更換，前台重新整理後就會看到', 'ok');
+    } catch (err) { dItem.thumb = old; renderStrip(); showMsg($('dMsg'), '換縮圖失敗：' + err.message); }
+  }
+  $('dImgs').addEventListener('click', function (e) { var b = e.target.closest('.im.pick'); if (b) pickThumb(b); });
+  $('dImgs').addEventListener('keydown', function (e) { if (e.key !== 'Enter' && e.key !== ' ') return; var b = e.target.closest('.im.pick'); if (b) { e.preventDefault(); pickThumb(b); } });
+  $('dShow').addEventListener('change', async function () {
+    var box = this, want = box.checked;
+    if (!dItem) return;
+    box.disabled = true; showMsg($('dMsg'), '儲存中…', 'info');
+    try {
+      await saveField({ show: want ? '✓' : '' });
+      dItem.show = want; renderLib();
+      showMsg($('dMsg'), want ? '已設為顯示在前台' : '已設為不顯示在前台', 'ok');
+    } catch (err) { box.checked = !want; showMsg($('dMsg'), '儲存失敗：' + err.message); }
+    finally { box.disabled = false; }
+  });
   $('polas').addEventListener('click', function (e) {
     var b = e.target.closest('.pola'); if (!b) return;
     var x = items.filter(function (i) { return i.row === +b.dataset.row; })[0]; if (!x) return;
     dItem = x;
     $('dTitle').textContent = (x.date ? x.date.s : '日期不明') + '・' + x.who;
-    $('dImgs').innerHTML = imgsOf(x).map(function (u, i) {
-      return '<span class="im"' + (u === x.thumb ? ' aria-pressed="true"' : '') + '><img src="' + esc(u) + '" alt="" loading="lazy"><span class="no">' + pad(i + 1) + '</span>' + (u === x.thumb ? '<span class="th">★ 縮圖</span>' : '') + '</span>';
-    }).join('') || '<span class="hint">沒有圖片</span>';
+    renderStrip();
+    $('dTip').hidden = !(x.folder && x.n);
+    $('dShowRow').hidden = false; $('dShow').checked = x.show;
     $('dInfo').innerHTML =
       '<span><span class="hint">來源：</span>' + (x.src === 'blog' ? '部落格' : 'IG') + '　<span class="hint">季節：</span>' + esc(x.seasons || '—') + '　<span class="hint">試算表：</span>第 ' + x.row + ' 列</span>' +
       (x.folder ? '<span><span class="hint">備份資料夾：</span><code style="display:inline;padding:1px 6px">' + esc(x.folder) + '</code></span>' : '<span class="hint">還沒有整組備份</span>') +
