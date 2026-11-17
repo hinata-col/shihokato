@@ -425,10 +425,10 @@
   /* ───────── 日文字體與樣式 ───────── */
   var css =
     '.i18n-wait body{visibility:hidden}' +
-    'html[lang="ja"]{--font-hand:"Yomogi","Handnote","Noto Sans JP",sans-serif;--font-body:"Noto Sans JP","Huninn","Noto Sans TC",system-ui,sans-serif}' +
+    'html[lang="ja"]{--font-hand:"Zen Maru Gothic","Handnote","Noto Sans JP",sans-serif;--font-body:"Noto Sans JP","Huninn","Noto Sans TC",system-ui,sans-serif}' +
     'html[lang="ja"] .site{letter-spacing:-.05em;word-spacing:-.25em;white-space:nowrap;font-size:20px}' +
     'html[lang="ja"] .label{font-size:calc(var(--W) * .05);padding-left:calc(var(--W) * .03);padding-right:calc(var(--W) * .03)}' +
-    'html[lang="ja"] .snav li>*{font-family:"Yomogi","HandnoteNav","Noto Sans JP",sans-serif!important}' +
+    'html[lang="ja"] .snav li>*{font-family:"Zen Maru Gothic","HandnoteNav","Noto Sans JP",sans-serif!important}' +
     '.lang-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 11px;border:1.5px solid var(--ink-soft,#43609a);border-radius:999px;' +
     'background:rgba(255,255,255,.6);color:var(--ink,#1c3566);font:600 14px/1 system-ui,"Noto Sans JP","Noto Sans TC",sans-serif;letter-spacing:.04em;cursor:pointer;white-space:nowrap;flex:none;margin-left:auto}' +
     '.lang-btn:hover{background:#fff}.lang-btn:focus-visible{outline:2px solid var(--denim,#2b5090);outline-offset:2px}' +
@@ -439,7 +439,7 @@
   function loadFonts() {
     if (fontLoaded) return; fontLoaded = true;
     var l = document.createElement('link'); l.rel = 'stylesheet';
-    l.href = 'https://fonts.googleapis.com/css2?family=Yomogi&family=Noto+Sans+JP:wght@400;500;700&display=swap';
+    l.href = 'https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap';
     document.head.appendChild(l);
   }
 
