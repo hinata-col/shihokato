@@ -9,8 +9,8 @@
     { n: '各種歡樂', u: 'fun/' },
     { n: '訪談報導', u: 'interviews/' },
     { n: '彩弘祭典', u: 'ayahiro2/' },
-    { n: '行程', u: 'schedule/' },
     { n: '私服穿搭', u: 'outfit/' },
+    { n: '行程', u: 'schedule/' },
     { n: '相關資源', u: 'resources/' }
   ];
   var script = document.currentScript;
