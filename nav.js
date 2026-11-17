@@ -26,7 +26,7 @@
     '.snav[data-open="true"] li{opacity:1;transform:none rotate(var(--r,0deg))}' +
     '.snav li>*{display:block;margin:3px 0;padding:7px 22px;white-space:nowrap;text-decoration:none;' +
     'font-family:"HandnoteNav","Huninn",sans-serif;font-size:22px;letter-spacing:.1em;color:#1c3566;' +
-    'background:radial-gradient(circle,rgba(255,255,255,.95) 1.3px,transparent 1.8px) 3px 3px/11px 11px,#bfe4f4;' +
+    'background:radial-gradient(circle,#fff 2px,transparent 2.4px) 0 0/14px 14px,radial-gradient(circle,#fff 2px,transparent 2.4px) 7px 7px/14px 14px,#bfe4f4;' +
     'clip-path:polygon(2% 0,98% 0,100% 18%,98% 36%,100% 54%,98% 72%,100% 100%,2% 100%,0 80%,2% 60%,0 40%,2% 20%);' +
     'filter:drop-shadow(0 1px 2px rgba(20,44,100,.3));min-height:44px;box-sizing:border-box}' +
     '.snav a:hover{background:#fff}' +
