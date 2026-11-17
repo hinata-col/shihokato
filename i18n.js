@@ -426,6 +426,7 @@
   var css =
     '.i18n-wait body{visibility:hidden}' +
     'html[lang="ja"]{--font-hand:"Yomogi","Handnote","Noto Sans JP",sans-serif;--font-body:"Noto Sans JP","Huninn","Noto Sans TC",system-ui,sans-serif}' +
+    'html[lang="ja"] .site{letter-spacing:-.05em;word-spacing:-.25em;white-space:nowrap;font-size:20px}' +
     'html[lang="ja"] .label{font-size:calc(var(--W) * .05);padding-left:calc(var(--W) * .03);padding-right:calc(var(--W) * .03)}' +
     'html[lang="ja"] .snav li>*{font-family:"Yomogi","HandnoteNav","Noto Sans JP",sans-serif!important}' +
     '.lang-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 11px;border:1.5px solid var(--ink-soft,#43609a);border-radius:999px;' +
