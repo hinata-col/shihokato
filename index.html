@@ -348,9 +348,9 @@ a{color:inherit}
   max-width:1120px;margin:0 auto;
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px));
-  display:flex;justify-content:center;
+  display:flex;flex-direction:column;align-items:stretch;
 }
-.fine{margin:0;font-size:12px;color:var(--ink-soft);text-align:center}
+.fine{margin:0;font-size:12px;color:var(--ink-soft);text-align:center;text-wrap:balance}
 .fine+.fine{margin-top:6px}
 .about-link{color:inherit;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
 
@@ -550,15 +550,14 @@ a{color:inherit}
 
 <div class="fab" id="fab" hidden>
   <nav class="fab-menu" id="fabMenu" aria-label="頁面選單" data-open="false" inert>
-    <a href="#basic" data-go="基本資料" style="--d:8;--r:-2deg"><span>基本資料</span></a>
-    <a href="works/" data-go="作品" style="--d:7;--r:1.5deg"><span>作品</span></a>
-    <a href="#fun" data-go="各種歡樂" style="--d:6;--r:-1deg"><span>各種歡樂</span></a>
-    <a href="interviews/" data-go="訪談報導" style="--d:5;--r:-1.5deg"><span>訪談報導</span></a>
-    <a href="#ayahiro" data-go="彩弘祭典" style="--d:4;--r:2deg"><span>彩弘祭典</span></a>
-    <a href="outfit/" data-go="私服穿搭" style="--d:3;--r:-1deg"><span>私服穿搭</span></a>
-    <a href="schedule/" data-go="行程" style="--d:2;--r:1deg"><span>行程</span></a>
-    <a href="#resources" data-go="相關資源" style="--d:1;--r:-2deg"><span>相關資源</span></a>
-    <a href="about/" data-go="關於本站" style="--d:0;--r:1.5deg"><span>關於本站</span></a>
+    <a href="#basic" data-go="基本資料" style="--d:7;--r:-2deg"><span>基本資料</span></a>
+    <a href="works/" data-go="作品" style="--d:6;--r:1.5deg"><span>作品</span></a>
+    <a href="#fun" data-go="各種歡樂" style="--d:5;--r:-1deg"><span>各種歡樂</span></a>
+    <a href="interviews/" data-go="訪談報導" style="--d:4;--r:-1.5deg"><span>訪談報導</span></a>
+    <a href="#ayahiro" data-go="彩弘祭典" style="--d:3;--r:2deg"><span>彩弘祭典</span></a>
+    <a href="outfit/" data-go="私服穿搭" style="--d:2;--r:-1deg"><span>私服穿搭</span></a>
+    <a href="schedule/" data-go="行程" style="--d:1;--r:1deg"><span>行程</span></a>
+    <a href="#resources" data-go="相關資源" style="--d:0;--r:-2deg"><span>相關資源</span></a>
   </nav>
   <button type="button" class="fab-btn" id="fabBtn" aria-expanded="false" aria-controls="fabMenu" aria-label="展開頁面選單">
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg>
