@@ -773,18 +773,17 @@ img[data-ph].fo{animation:phin .45s ease}
   function gcOpen() {
     gcShow(false); gcMsg.textContent = ''; gcCur = null;
     if (gcDlg.showModal) gcDlg.showModal(); else gcDlg.setAttribute('open', '');
-    $('gcCityBox').hidden = !!gcBucket; $('gcCity').setAttribute('aria-expanded', String(!gcBucket));
-    if (!gcBucket) wxMsg.textContent = '先選一個城市，才知道今天適合穿什麼季節。';
+    $('gcCityBox').hidden = true; $('gcCity').setAttribute('aria-expanded', 'false');
+    if (!gcBucket) gcMsg.textContent = '還沒設定城市，所以是從全部穿搭隨機抽的。按「換城市」設定後，就會依今天的氣溫挑。';
   }
   function gcClose() { if (gcDlg.close) gcDlg.close(); else gcDlg.removeAttribute('open'); }
   function gcPool() {
-    return items.filter(function (it) { return it.img && (!gcWho || it.w === gcWho) && it.ss.some(function (s) { return gcBucket.indexOf(s) >= 0; }); });
+    return items.filter(function (it) { return it.img && (!gcWho || it.w === gcWho) && (!gcBucket || it.ss.some(function (s) { return gcBucket.indexOf(s) >= 0; })); });
   }
   function gcDraw() {
-    if (!gcBucket) { $('gcCityBox').hidden = false; $('gcCity').setAttribute('aria-expanded', 'true'); wxMsg.textContent = '先選一個城市，才知道今天適合穿什麼季節。'; return; }
     var pool = gcPool();
-    if (!pool.length) { gcShow(false); gcMsg.textContent = '「' + gcBucket.join('・') + '」' + (gcWho ? '、' + gcWho : '') + '還沒有穿搭可以抽，換個人物試試。'; return; }
-    gcMsg.textContent = '';
+    if (!pool.length) { gcShow(false); gcMsg.textContent = (gcBucket ? '「' + gcBucket.join('・') + '」' : '') + (gcWho ? (gcBucket ? '、' : '') + gcWho : '') + '還沒有穿搭可以抽，換個人物試試。'; return; }
+    gcMsg.textContent = gcBucket ? '' : '還沒設定城市，所以是從全部穿搭隨機抽的。按「換城市」設定後，就會依今天的氣溫挑。';
     var cand = pool.length > 1 ? pool.filter(function (x) { return items.indexOf(x) !== gcLast; }) : pool;
     var it = cand[Math.floor(Math.random() * cand.length)];
     gcLast = items.indexOf(it); gcCur = it;
