@@ -300,6 +300,7 @@ a{color:inherit}
   transition:background-position .4s ease;
 }
 .sticker:hover .gloss{--gx:140%}
+.shape.has-img .gloss{-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
 
 /* 貼紙提示動態：翻開貼紙簿後，同一頁的貼紙輪流「閃動兩下」（微放大＋泛一圈藍白光），提醒「可以點」。
    每張 12 秒一輪、錯開 3 秒；滑過、聚焦或按下時停止；系統設定「減少動態」時整段關閉（最底下的 reduced-motion 規則） */
@@ -812,6 +813,7 @@ a{color:inherit}
 })();
 </script>
 
+<script>Array.prototype.forEach.call(document.querySelectorAll('.shape.has-img'),function(sh){var i=sh.querySelector('img.photo'),g=sh.querySelector('.gloss');if(i&&g)g.style.setProperty('--m','url('+i.getAttribute('src')+')')});</script>
 <script>(function(){function h(i){if(i.__f)return;i.__f=1;if(i.complete&&i.naturalWidth){if(i.dataset.ph!=null)i.style.backgroundImage='none';return}i.classList.add('fx');function ok(){i.classList.add('fo');if(i.dataset.ph!=null)setTimeout(function(){i.style.backgroundImage='none'},500)}i.addEventListener('load',ok);i.addEventListener('error',function(){i.classList.add('fo')});if(i.complete&&i.naturalWidth)ok()}Array.prototype.forEach.call(document.images,h);if(window.MutationObserver)new MutationObserver(function(m){m.forEach(function(r){Array.prototype.forEach.call(r.addedNodes,function(n){if(n.nodeType!==1)return;if(n.tagName==='IMG')h(n);else if(n.querySelectorAll)Array.prototype.forEach.call(n.querySelectorAll('img'),h)})})}).observe(document.documentElement,{childList:true,subtree:true})})();</script>
 <script src="i18n.js"></script>
 </body>
