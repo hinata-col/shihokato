@@ -300,6 +300,34 @@ a{color:inherit}
   transition:background-position .4s ease;
 }
 .sticker:hover .gloss{--gx:140%}
+
+/* 貼紙提示動態：翻開貼紙簿後，同一頁的貼紙輪流微晃一下並泛一圈藍光，提醒「可以點」。
+   每張 16 秒一輪、錯開 4 秒；滑過或聚焦時停止；系統設定「減少動態」時整段關閉（最底下的 reduced-motion 規則） */
+@keyframes stk-hint{
+  0%{transform:rotate(var(--r,0deg)) scale(1)}
+  2.2%{transform:rotate(calc(var(--r,0deg) - 2.6deg)) scale(1.04)}
+  4.8%{transform:rotate(calc(var(--r,0deg) + 2.4deg)) scale(1.04)}
+  7.4%{transform:rotate(calc(var(--r,0deg) - 1.6deg)) scale(1.03)}
+  10%{transform:rotate(calc(var(--r,0deg) + 1deg)) scale(1.015)}
+  13%,100%{transform:rotate(var(--r,0deg)) scale(1)}
+}
+@keyframes stk-glow{
+  0%,15%,100%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 0 rgba(140,185,255,0))}
+  5%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 0 16px rgba(120,175,255,.95))}
+  10%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 2px rgba(255,255,255,.6)) drop-shadow(0 0 10px rgba(120,175,255,.55))}
+}
+.sticker[data-go="彩弘祭典"],.sticker[data-go="基本資料"]{--k:0}
+.sticker[data-go="行程"],.sticker[data-go="作品"]{--k:1}
+.sticker[data-go="私服穿搭"],.sticker[data-go="各種歡樂"]{--k:2}
+.sticker[data-go="相關資源"],.sticker[data-go="訪談報導"]{--k:3}
+.book[data-open="true"] .sticker{animation:stk-hint 16s ease-in-out calc(1.4s + var(--k,0) * 4s) infinite}
+.book[data-open="true"] .sticker .shape{animation:stk-glow 16s ease-in-out calc(1.4s + var(--k,0) * 4s) infinite}
+@media (max-width:760px){
+  .book[data-open="true"][data-page="1"] #pageRight .sticker,.book[data-open="true"][data-page="1"] #pageRight .sticker .shape,
+  .book[data-open="true"][data-page="2"] #pageLeft .sticker,.book[data-open="true"][data-page="2"] #pageLeft .sticker .shape{animation:none}
+}
+.book[data-open="true"] .sticker:hover,.book[data-open="true"] .sticker:focus-visible,.book[data-open="true"] .sticker:active,
+.book[data-open="true"] .sticker:hover .shape,.book[data-open="true"] .sticker:focus-visible .shape,.book[data-open="true"] .sticker:active .shape{animation:none}
 /* 換上真正貼紙圖時：在 .shape 加 has-img，裡面放 <img class="photo">，白邊與陰影會自動生成 */
 .shape.has-img .die,.shape.has-img .art{display:none}
 .photo{
