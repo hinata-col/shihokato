@@ -301,27 +301,27 @@ a{color:inherit}
 }
 .sticker:hover .gloss{--gx:140%}
 
-/* 貼紙提示動態：翻開貼紙簿後，同一頁的貼紙輪流微晃一下並泛一圈藍光，提醒「可以點」。
-   每張 16 秒一輪、錯開 4 秒；滑過或聚焦時停止；系統設定「減少動態」時整段關閉（最底下的 reduced-motion 規則） */
+/* 貼紙提示動態：翻開貼紙簿後，同一頁的貼紙輪流「閃動兩下」（微放大＋泛一圈藍白光），提醒「可以點」。
+   每張 12 秒一輪、錯開 3 秒；滑過、聚焦或按下時停止；系統設定「減少動態」時整段關閉（最底下的 reduced-motion 規則） */
 @keyframes stk-hint{
   0%{transform:rotate(var(--r,0deg)) scale(1)}
-  2.2%{transform:rotate(calc(var(--r,0deg) - 2.6deg)) scale(1.04)}
-  4.8%{transform:rotate(calc(var(--r,0deg) + 2.4deg)) scale(1.04)}
-  7.4%{transform:rotate(calc(var(--r,0deg) - 1.6deg)) scale(1.03)}
-  10%{transform:rotate(calc(var(--r,0deg) + 1deg)) scale(1.015)}
-  13%,100%{transform:rotate(var(--r,0deg)) scale(1)}
+  1.6%{transform:rotate(calc(var(--r,0deg) - 1.4deg)) scale(1.07)}
+  3.6%{transform:rotate(var(--r,0deg)) scale(1.01)}
+  5.2%{transform:rotate(calc(var(--r,0deg) + 1.4deg)) scale(1.07)}
+  8%,100%{transform:rotate(var(--r,0deg)) scale(1)}
 }
 @keyframes stk-glow{
-  0%,15%,100%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 0 rgba(140,185,255,0))}
-  5%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 0 16px rgba(120,175,255,.95))}
-  10%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 2px rgba(255,255,255,.6)) drop-shadow(0 0 10px rgba(120,175,255,.55))}
+  0%,9%,100%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 0 rgba(140,185,255,0))}
+  1.6%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 4px rgba(255,255,255,1)) drop-shadow(0 0 18px rgba(110,170,255,1))}
+  3.6%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 1px rgba(255,255,255,.4)) drop-shadow(0 0 6px rgba(110,170,255,.35))}
+  5.2%{filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 7px 7px rgba(20,44,100,.34)) drop-shadow(0 0 4px rgba(255,255,255,1)) drop-shadow(0 0 18px rgba(110,170,255,1))}
 }
 .sticker[data-go="彩弘祭典"],.sticker[data-go="基本資料"]{--k:0}
 .sticker[data-go="行程"],.sticker[data-go="作品"]{--k:1}
 .sticker[data-go="私服穿搭"],.sticker[data-go="各種歡樂"]{--k:2}
 .sticker[data-go="相關資源"],.sticker[data-go="訪談報導"]{--k:3}
-.book[data-open="true"] .sticker{animation:stk-hint 16s ease-in-out calc(1.4s + var(--k,0) * 4s) infinite}
-.book[data-open="true"] .sticker .shape{animation:stk-glow 16s ease-in-out calc(1.4s + var(--k,0) * 4s) infinite}
+.book[data-open="true"] .sticker{animation:stk-hint 12s ease-in-out calc(1s + var(--k,0) * 3s) infinite}
+.book[data-open="true"] .sticker .shape{animation:stk-glow 12s ease-in-out calc(1s + var(--k,0) * 3s) infinite}
 @media (max-width:760px){
   .book[data-open="true"][data-page="1"] #pageRight .sticker,.book[data-open="true"][data-page="1"] #pageRight .sticker .shape,
   .book[data-open="true"][data-page="2"] #pageLeft .sticker,.book[data-open="true"][data-page="2"] #pageLeft .sticker .shape{animation:none}
