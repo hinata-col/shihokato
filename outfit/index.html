@@ -735,13 +735,13 @@ img[data-ph].fo{animation:phin .45s ease}
     $('shTxt').textContent = shareText(it);
     var hasCard = isR2(it.img);
     $('shDl').hidden = !hasCard; $('shImg').hidden = true; $('shNote').hidden = false;
-    $('shNote').textContent = hasCard ? '圖卡製作中…' : '這則還沒有 R2 縮圖，沒辦法製作圖卡，只能分享文案。';
+    $('shNote').textContent = hasCard ? '圖卡製作中…' : '這則貼文沒有縮圖，無法製作圖卡，只能分享文案。';
     if (!hasCard) return;
     makeCard(it).then(function (bl) {
       if (my !== shSeq) return;
       shBlob = bl; shFile = new File([bl], 'shihokato-outfit.jpg', { type: 'image/jpeg' });
       shUrl = URL.createObjectURL(bl); $('shImg').src = shUrl; $('shImg').hidden = false; $('shNote').hidden = true;
-    }).catch(function () { if (my === shSeq) { $('shNote').textContent = '圖卡做不出來（可能是 R2 的 CORS 還沒設好），仍然可以分享文案。'; $('shDl').hidden = true; } });
+    }).catch(function () { if (my === shSeq) { $('shNote').textContent = '圖卡生成失敗，仍然可以分享文案。'; $('shDl').hidden = true; } });
   }
   $('igS').addEventListener('click', showPreview);
   $('shBack').addEventListener('click', function () { if (shareMode) closeIG(); else showMain(); });
