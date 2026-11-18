@@ -653,7 +653,7 @@ img[data-ph].fo{animation:phin .45s ease}
   }
   function closeIG() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); $('igF').innerHTML = ''; showMain(); }
   /* 分享文案：跟著全站語言（localStorage 'shk-lang' 或 <html lang>），預設中文；各人物 hashtag 在 PEOPLE 裡 */
-  var TXT = { zh: '今天的穿搭推薦', ja: '今日のコーデ' };
+  var TXT = { zh: '今天的穿搭推薦', ja: '今日のおすすめコーデ' };
   function siteLang() {
     try { var l = localStorage.getItem('shk-lang'); if (l) return /^ja/i.test(l) ? 'ja' : 'zh'; } catch (e) {}
     return /^ja/i.test(document.documentElement.lang || '') ? 'ja' : 'zh';
